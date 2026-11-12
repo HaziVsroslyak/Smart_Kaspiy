@@ -13,3 +13,11 @@ Backend/tests/
 Backend/data/raw/*
 Backend/data/processed/*
 Backend/artifacts/*
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.git/

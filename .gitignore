@@ -18,3 +18,11 @@ Backend/artifacts/*
 node_modules/
 FrontEnd/dist/
 FrontEnd/build/
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.git/

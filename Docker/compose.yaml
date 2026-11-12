@@ -15,3 +15,16 @@ services:
       timeout: 10s
       start_period: 60s
       retries: 3
+
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.frontend
+      args:
+        VITE_API_URL: http://127.0.0.1:8000
+    ports:
+      - "127.0.0.1:3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
