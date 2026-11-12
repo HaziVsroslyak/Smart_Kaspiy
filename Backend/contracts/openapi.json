@@ -1,0 +1,2271 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Smart Caspian Transit",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/health": {
+      "get": {
+        "summary": "Health",
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/weather/forecast": {
+      "get": {
+        "summary": "Weather Forecast",
+        "operationId": "weather_forecast_api_v1_weather_forecast_get",
+        "parameters": [
+          {
+            "name": "latitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 90,
+              "minimum": -90,
+              "title": "Latitude"
+            }
+          },
+          {
+            "name": "longitude",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "number",
+              "maximum": 180,
+              "minimum": -180,
+              "title": "Longitude"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeatherForecast"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/predictions/delay": {
+      "post": {
+        "summary": "Predict Delay",
+        "operationId": "predict_delay_api_v1_predictions_delay_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaspianFeatures"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DelayPrediction"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/predictions/delay-from-weather": {
+      "post": {
+        "summary": "Predict Weather Delay",
+        "operationId": "predict_weather_delay_api_v1_predictions_delay_from_weather_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForecastDelayRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastDelayPrediction"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/optimize/jit": {
+      "post": {
+        "summary": "Optimize Jit",
+        "operationId": "optimize_jit_api_v1_optimize_jit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JITInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JITResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/customs/clear": {
+      "post": {
+        "summary": "Clear Customs",
+        "operationId": "clear_customs_api_v1_customs_clear_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CustomsRequest"
+                  },
+                  {
+                    "$ref": "#/components/schemas/LegacyCustomsRequest"
+                  }
+                ],
+                "title": "Payload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/route/calculate": {
+      "post": {
+        "summary": "Calculate Route",
+        "operationId": "calculate_route_api_v1_route_calculate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RouteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voyages": {
+      "post": {
+        "summary": "Create Voyage",
+        "operationId": "create_voyage_api_v1_voyages_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoyageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoyageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voyages/{voyage_id}": {
+      "get": {
+        "summary": "Get Voyage",
+        "operationId": "get_voyage_api_v1_voyages__voyage_id__get",
+        "parameters": [
+          {
+            "name": "voyage_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Voyage Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoyageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/voyages/{voyage_id}/reforecast": {
+      "post": {
+        "summary": "Reforecast Voyage",
+        "operationId": "reforecast_voyage_api_v1_voyages__voyage_id__reforecast_post",
+        "parameters": [
+          {
+            "name": "voyage_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Voyage Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoyageUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoyageResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CargoData": {
+        "properties": {
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight",
+            "description": "Weight in kilograms"
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Type"
+          },
+          "sender": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Sender"
+          },
+          "recipient": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Recipient"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "weight",
+          "type",
+          "sender",
+          "recipient"
+        ],
+        "title": "CargoData",
+        "description": "Weight is in kg; text is hashed exactly as supplied, without trimming."
+      },
+      "CargoPayload": {
+        "properties": {
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Weight",
+            "description": "Weight in kilograms"
+          },
+          "type": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Type"
+          },
+          "id": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Id"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "weight",
+          "type",
+          "id"
+        ],
+        "title": "CargoPayload",
+        "description": "Cargo ID and description; weight is in kilograms."
+      },
+      "CaspianFeatures": {
+        "properties": {
+          "departure_port": {
+            "type": "string",
+            "enum": [
+              "Астрахань",
+              "Махачкала",
+              "Оля"
+            ],
+            "title": "Departure Port"
+          },
+          "arrival_port": {
+            "type": "string",
+            "enum": [
+              "Энзели",
+              "Амирабад"
+            ],
+            "title": "Arrival Port"
+          },
+          "wind_speed_ms": {
+            "type": "number",
+            "maximum": 25.0,
+            "minimum": 0.0,
+            "title": "Wind Speed Ms"
+          },
+          "wave_height_m": {
+            "type": "number",
+            "maximum": 4.5,
+            "minimum": 0.1,
+            "title": "Wave Height M"
+          },
+          "port_congestion_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 10.0,
+            "title": "Port Congestion Percent"
+          },
+          "season": {
+            "type": "string",
+            "enum": [
+              "Winter",
+              "Spring",
+              "Summer",
+              "Autumn"
+            ],
+            "title": "Season"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "departure_port",
+          "arrival_port",
+          "wind_speed_ms",
+          "wave_height_m",
+          "port_congestion_percent",
+          "season"
+        ],
+        "title": "CaspianFeatures"
+      },
+      "Checkpoint": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "latitude": {
+            "type": "number",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "title": "Longitude"
+          },
+          "passage_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Passage At"
+          },
+          "forecast_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast At"
+          },
+          "retrieved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieved At"
+          },
+          "wind_speed_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Speed Ms"
+          },
+          "wind_gust_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Gust Ms"
+          },
+          "wave_height_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Height M"
+          },
+          "severity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Severity"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "forecast",
+              "scenario",
+              "outside_horizon"
+            ],
+            "title": "Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "name",
+          "latitude",
+          "longitude",
+          "passage_at",
+          "status"
+        ],
+        "title": "Checkpoint"
+      },
+      "ConnectionSchedule": {
+        "properties": {
+          "terminal": {
+            "type": "string",
+            "enum": [
+              "Астрахань",
+              "Махачкала",
+              "Энзели",
+              "Решт"
+            ],
+            "title": "Terminal"
+          },
+          "transport_mode": {
+            "type": "string",
+            "enum": [
+              "ship",
+              "rail",
+              "road"
+            ],
+            "title": "Transport Mode"
+          },
+          "first_departure_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "First Departure At"
+          },
+          "interval_hours": {
+            "type": "number",
+            "maximum": 168.0,
+            "minimum": 1.0,
+            "title": "Interval Hours"
+          },
+          "handling_hours": {
+            "type": "number",
+            "maximum": 48.0,
+            "minimum": 0.0,
+            "title": "Handling Hours",
+            "default": 2
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "terminal",
+          "transport_mode",
+          "first_departure_at",
+          "interval_hours"
+        ],
+        "title": "ConnectionSchedule"
+      },
+      "Coordinates": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude"
+        ],
+        "title": "Coordinates"
+      },
+      "CustomsRequest": {
+        "properties": {
+          "cargo_payload": {
+            "$ref": "#/components/schemas/CargoPayload"
+          },
+          "provided_hash": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-fA-F]{64}$",
+            "title": "Provided Hash"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "cargo_payload",
+          "provided_hash"
+        ],
+        "title": "CustomsRequest"
+      },
+      "CustomsResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "Pre-cleared",
+              "Requires inspection"
+            ],
+            "title": "Status"
+          },
+          "green_corridor": {
+            "type": "boolean",
+            "title": "Green Corridor"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "green_corridor"
+        ],
+        "title": "CustomsResponse"
+      },
+      "DelayPrediction": {
+        "properties": {
+          "delay_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Delay Hours"
+          },
+          "model": {
+            "type": "string",
+            "const": "CaspianPredictor",
+            "title": "Model",
+            "default": "CaspianPredictor"
+          },
+          "training_data": {
+            "type": "string",
+            "const": "synthetic",
+            "title": "Training Data",
+            "default": "synthetic"
+          },
+          "features_used": {
+            "$ref": "#/components/schemas/CaspianFeatures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "delay_hours",
+          "features_used"
+        ],
+        "title": "DelayPrediction"
+      },
+      "DelayReason": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "weather",
+              "port_congestion",
+              "missed_connection",
+              "connection_wait",
+              "border",
+              "storm_restriction",
+              "forecast_gap"
+            ],
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Hours",
+            "default": 0
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "DelayReason"
+      },
+      "ForecastDelayPrediction": {
+        "properties": {
+          "delay_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Delay Hours"
+          },
+          "model": {
+            "type": "string",
+            "const": "CaspianPredictor",
+            "title": "Model",
+            "default": "CaspianPredictor"
+          },
+          "training_data": {
+            "type": "string",
+            "const": "synthetic",
+            "title": "Training Data",
+            "default": "synthetic"
+          },
+          "features_used": {
+            "$ref": "#/components/schemas/CaspianFeatures"
+          },
+          "weather_provider": {
+            "type": "string",
+            "const": "OpenWeather",
+            "title": "Weather Provider",
+            "default": "OpenWeather"
+          },
+          "forecast_valid_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Forecast Valid At"
+          },
+          "weather_retrieved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Weather Retrieved At"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Coordinates"
+          },
+          "wave_source": {
+            "type": "string",
+            "title": "Wave Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "delay_hours",
+          "features_used",
+          "forecast_valid_at",
+          "weather_retrieved_at",
+          "location",
+          "wave_source"
+        ],
+        "title": "ForecastDelayPrediction"
+      },
+      "ForecastDelayRequest": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "departure_port": {
+            "type": "string",
+            "enum": [
+              "Астрахань",
+              "Махачкала",
+              "Оля"
+            ],
+            "title": "Departure Port"
+          },
+          "arrival_port": {
+            "type": "string",
+            "enum": [
+              "Энзели",
+              "Амирабад"
+            ],
+            "title": "Arrival Port"
+          },
+          "forecast_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Forecast At"
+          },
+          "wave_height_m": {
+            "type": "number",
+            "maximum": 4.5,
+            "minimum": 0.1,
+            "title": "Wave Height M"
+          },
+          "wave_source": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Wave Source"
+          },
+          "port_congestion_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 10.0,
+            "title": "Port Congestion Percent"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "departure_port",
+          "arrival_port",
+          "forecast_at",
+          "wave_height_m",
+          "wave_source",
+          "port_congestion_percent"
+        ],
+        "title": "ForecastDelayRequest"
+      },
+      "ForecastRouteWeather": {
+        "properties": {
+          "latitude": {
+            "type": "number",
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Latitude"
+          },
+          "longitude": {
+            "type": "number",
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Longitude"
+          },
+          "source": {
+            "type": "string",
+            "const": "openweather",
+            "title": "Source"
+          },
+          "forecast_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Forecast At"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "latitude",
+          "longitude",
+          "source",
+          "forecast_at"
+        ],
+        "title": "ForecastRouteWeather"
+      },
+      "ForecastSlot": {
+        "properties": {
+          "valid_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Valid At"
+          },
+          "temperature_c": {
+            "type": "number",
+            "title": "Temperature C"
+          },
+          "wind_speed_ms": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Wind Speed Ms"
+          },
+          "wind_direction_deg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 360.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Direction Deg"
+          },
+          "wind_gust_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Gust Ms"
+          },
+          "humidity_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Humidity Percent"
+          },
+          "pressure_hpa": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Pressure Hpa"
+          },
+          "precipitation_probability": {
+            "type": "number",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Precipitation Probability"
+          },
+          "rain_3h_mm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Rain 3H Mm"
+          },
+          "snow_3h_mm": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Snow 3H Mm"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "wave_height_m": {
+            "type": "null",
+            "title": "Wave Height M"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "valid_at",
+          "temperature_c",
+          "wind_speed_ms",
+          "humidity_percent",
+          "pressure_hpa",
+          "precipitation_probability",
+          "rain_3h_mm",
+          "snow_3h_mm",
+          "description"
+        ],
+        "title": "ForecastSlot"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready",
+              "not_ready"
+            ],
+            "title": "Status"
+          },
+          "routing_ready": {
+            "type": "boolean",
+            "title": "Routing Ready"
+          },
+          "caspian_model_ready": {
+            "type": "boolean",
+            "title": "Caspian Model Ready"
+          },
+          "weather_configured": {
+            "type": "boolean",
+            "title": "Weather Configured"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "status",
+          "routing_ready",
+          "caspian_model_ready",
+          "weather_configured"
+        ],
+        "title": "HealthResponse"
+      },
+      "JITInput": {
+        "properties": {
+          "distance_nm": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Distance Nm"
+          },
+          "current_speed_knots": {
+            "type": "number",
+            "minimum": 6.0,
+            "title": "Current Speed Knots"
+          },
+          "port_delay_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Port Delay Hours"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "distance_nm",
+          "current_speed_knots",
+          "port_delay_hours"
+        ],
+        "title": "JITInput"
+      },
+      "JITResponse": {
+        "properties": {
+          "new_speed_knots": {
+            "type": "number",
+            "minimum": 6.0,
+            "title": "New Speed Knots"
+          },
+          "arrival_in_hours": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Arrival In Hours"
+          },
+          "berth_available_in_hours": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Berth Available In Hours"
+          },
+          "remaining_wait_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Remaining Wait Hours"
+          },
+          "baseline_fuel_tonnes": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Baseline Fuel Tonnes"
+          },
+          "optimized_fuel_tonnes": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Optimized Fuel Tonnes"
+          },
+          "fuel_saved_tonnes": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Fuel Saved Tonnes"
+          },
+          "co2_saved_tonnes": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Co2 Saved Tonnes"
+          },
+          "fuel_coefficient": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Fuel Coefficient"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "new_speed_knots",
+          "arrival_in_hours",
+          "berth_available_in_hours",
+          "remaining_wait_hours",
+          "baseline_fuel_tonnes",
+          "optimized_fuel_tonnes",
+          "fuel_saved_tonnes",
+          "co2_saved_tonnes",
+          "fuel_coefficient"
+        ],
+        "title": "JITResponse"
+      },
+      "LegacyCustomsRequest": {
+        "properties": {
+          "cargo_data": {
+            "$ref": "#/components/schemas/CargoData"
+          },
+          "provided_hash": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 64,
+            "pattern": "^[0-9a-fA-F]{64}$",
+            "title": "Provided Hash"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "cargo_data",
+          "provided_hash"
+        ],
+        "title": "LegacyCustomsRequest",
+        "description": "Previously published cargo_data request, retained for existing clients."
+      },
+      "RoadConditions": {
+        "properties": {
+          "congestion_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Congestion Percent",
+            "default": 20
+          },
+          "condition_severity": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Condition Severity",
+            "default": 0
+          },
+          "border_wait_hours": {
+            "type": "number",
+            "maximum": 168.0,
+            "minimum": 0.0,
+            "title": "Border Wait Hours",
+            "description": "Hours per border crossing",
+            "default": 4
+          },
+          "closed": {
+            "type": "boolean",
+            "title": "Closed",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RoadConditions"
+      },
+      "RoadState": {
+        "properties": {
+          "congestion_percent": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Congestion Percent",
+            "default": 20
+          },
+          "condition_severity": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Condition Severity",
+            "default": 0
+          },
+          "border_wait_hours": {
+            "type": "number",
+            "maximum": 168.0,
+            "minimum": 0.0,
+            "title": "Border Wait Hours",
+            "default": 4
+          },
+          "closed": {
+            "type": "boolean",
+            "title": "Closed",
+            "default": false
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "RoadState"
+      },
+      "RouteDetails": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/RouteLeg"
+            },
+            "type": "array",
+            "title": "Segments"
+          },
+          "total_base_time_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Base Time Hours"
+          },
+          "total_delay_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Delay Hours"
+          },
+          "total_time_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Time Hours"
+          },
+          "total_cost_usd": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Cost Usd"
+          },
+          "total_co2_emissions_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Co2 Emissions Kg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nodes",
+          "segments",
+          "total_base_time_hours",
+          "total_delay_hours",
+          "total_time_hours",
+          "total_cost_usd",
+          "total_co2_emissions_kg"
+        ],
+        "title": "RouteDetails"
+      },
+      "RouteLeg": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "edge_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Edge Id"
+          },
+          "transport_mode": {
+            "type": "string",
+            "enum": [
+              "ship",
+              "rail",
+              "road"
+            ],
+            "title": "Transport Mode"
+          },
+          "base_time_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Base Time Hours"
+          },
+          "delay_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Delay Hours"
+          },
+          "expected_time_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Expected Time Hours"
+          },
+          "border_wait_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Border Wait Hours"
+          },
+          "cost_usd": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Cost Usd"
+          },
+          "co2_emissions_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Co2 Emissions Kg"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "edge_id",
+          "transport_mode",
+          "base_time_hours",
+          "delay_hours",
+          "expected_time_hours",
+          "border_wait_hours",
+          "cost_usd",
+          "co2_emissions_kg"
+        ],
+        "title": "RouteLeg"
+      },
+      "RouteRequest": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "maxLength": 200,
+            "minLength": 1,
+            "pattern": "\\S",
+            "title": "Target"
+          },
+          "current_weather": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Current Weather",
+            "default": 0
+          },
+          "season": {
+            "type": "string",
+            "enum": [
+              "winter",
+              "spring",
+              "summer",
+              "autumn"
+            ],
+            "title": "Season",
+            "default": "summer"
+          },
+          "weather": {
+            "anyOf": [
+              {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/ScenarioWeather"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ForecastRouteWeather"
+                  }
+                ],
+                "discriminator": {
+                  "propertyName": "source",
+                  "mapping": {
+                    "openweather": "#/components/schemas/ForecastRouteWeather",
+                    "scenario": "#/components/schemas/ScenarioWeather"
+                  }
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather"
+          },
+          "transport_modes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "ship",
+                "rail",
+                "road"
+              ]
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Transport Modes"
+          },
+          "road_conditions": {
+            "$ref": "#/components/schemas/RoadConditions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "target"
+        ],
+        "title": "RouteRequest"
+      },
+      "RouteResponse": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/RouteLeg"
+            },
+            "type": "array",
+            "title": "Segments"
+          },
+          "total_base_time_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Base Time Hours"
+          },
+          "total_delay_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Delay Hours"
+          },
+          "total_time_hours": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Time Hours"
+          },
+          "total_cost_usd": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Cost Usd"
+          },
+          "total_co2_emissions_kg": {
+            "type": "number",
+            "minimum": 0.0,
+            "title": "Total Co2 Emissions Kg"
+          },
+          "eco": {
+            "$ref": "#/components/schemas/RouteDetails"
+          },
+          "weather": {
+            "$ref": "#/components/schemas/WeatherImpact"
+          },
+          "road_conditions": {
+            "$ref": "#/components/schemas/RoadConditions"
+          },
+          "transport_modes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "ship",
+                "rail",
+                "road"
+              ]
+            },
+            "type": "array",
+            "title": "Transport Modes"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nodes",
+          "segments",
+          "total_base_time_hours",
+          "total_delay_hours",
+          "total_time_hours",
+          "total_cost_usd",
+          "total_co2_emissions_kg",
+          "eco",
+          "weather",
+          "road_conditions",
+          "transport_modes"
+        ],
+        "title": "RouteResponse"
+      },
+      "ScenarioWeather": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "const": "scenario",
+            "title": "Source"
+          },
+          "wind_speed_ms": {
+            "type": "number",
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Wind Speed Ms"
+          },
+          "wind_gust_ms": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 150.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Gust Ms"
+          },
+          "wave_height_m": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 30.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Height M"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "wind_speed_ms"
+        ],
+        "title": "ScenarioWeather"
+      },
+      "TimedLeg": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "title": "Target"
+          },
+          "edge_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ],
+            "title": "Edge Id"
+          },
+          "transport_mode": {
+            "type": "string",
+            "enum": [
+              "ship",
+              "rail",
+              "road"
+            ],
+            "title": "Transport Mode"
+          },
+          "base_time_hours": {
+            "type": "number",
+            "title": "Base Time Hours"
+          },
+          "delay_hours": {
+            "type": "number",
+            "title": "Delay Hours"
+          },
+          "expected_time_hours": {
+            "type": "number",
+            "title": "Expected Time Hours"
+          },
+          "border_wait_hours": {
+            "type": "number",
+            "title": "Border Wait Hours"
+          },
+          "cost_usd": {
+            "type": "number",
+            "title": "Cost Usd"
+          },
+          "co2_emissions_kg": {
+            "type": "number",
+            "title": "Co2 Emissions Kg"
+          },
+          "departure_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Departure At"
+          },
+          "arrival_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Arrival At"
+          },
+          "connection_wait_hours": {
+            "type": "number",
+            "title": "Connection Wait Hours"
+          },
+          "checkpoints": {
+            "items": {
+              "$ref": "#/components/schemas/Checkpoint"
+            },
+            "type": "array",
+            "title": "Checkpoints"
+          },
+          "features_used": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Features Used"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/DelayReason"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "eta_converged": {
+            "type": "boolean",
+            "title": "Eta Converged"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "edge_id",
+          "transport_mode",
+          "base_time_hours",
+          "delay_hours",
+          "expected_time_hours",
+          "border_wait_hours",
+          "cost_usd",
+          "co2_emissions_kg",
+          "departure_at",
+          "arrival_at",
+          "connection_wait_hours",
+          "checkpoints",
+          "features_used",
+          "reasons",
+          "eta_converged"
+        ],
+        "title": "TimedLeg"
+      },
+      "TimedRoute": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Nodes"
+          },
+          "segments": {
+            "items": {
+              "$ref": "#/components/schemas/TimedLeg"
+            },
+            "type": "array",
+            "title": "Segments"
+          },
+          "total_base_time_hours": {
+            "type": "number",
+            "title": "Total Base Time Hours"
+          },
+          "total_delay_hours": {
+            "type": "number",
+            "title": "Total Delay Hours"
+          },
+          "total_time_hours": {
+            "type": "number",
+            "title": "Total Time Hours"
+          },
+          "total_cost_usd": {
+            "type": "number",
+            "title": "Total Cost Usd"
+          },
+          "total_co2_emissions_kg": {
+            "type": "number",
+            "title": "Total Co2 Emissions Kg"
+          },
+          "departure_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Departure At"
+          },
+          "eta": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Eta"
+          },
+          "coverage": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial"
+            ],
+            "title": "Coverage"
+          },
+          "reasons": {
+            "items": {
+              "$ref": "#/components/schemas/DelayReason"
+            },
+            "type": "array",
+            "title": "Reasons"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "nodes",
+          "segments",
+          "total_base_time_hours",
+          "total_delay_hours",
+          "total_time_hours",
+          "total_cost_usd",
+          "total_co2_emissions_kg",
+          "departure_at",
+          "eta",
+          "coverage",
+          "reasons"
+        ],
+        "title": "TimedRoute"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VoyageConditions": {
+        "properties": {
+          "weather_mode": {
+            "type": "string",
+            "enum": [
+              "openweather",
+              "scenario"
+            ],
+            "title": "Weather Mode",
+            "default": "scenario"
+          },
+          "scenario": {
+            "$ref": "#/components/schemas/ScenarioWeather"
+          },
+          "road": {
+            "$ref": "#/components/schemas/RoadState"
+          },
+          "port_congestion": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Port Congestion"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "VoyageConditions"
+      },
+      "VoyageRequest": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "Астрахань",
+              "Махачкала",
+              "Энзели",
+              "Решт"
+            ],
+            "title": "Source"
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "Астрахань",
+              "Махачкала",
+              "Энзели",
+              "Решт"
+            ],
+            "title": "Target"
+          },
+          "departure_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Departure At"
+          },
+          "transport_modes": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "ship",
+                "rail",
+                "road"
+              ]
+            },
+            "type": "array",
+            "maxItems": 3,
+            "minItems": 1,
+            "title": "Transport Modes"
+          },
+          "connections": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectionSchedule"
+            },
+            "type": "array",
+            "maxItems": 8,
+            "title": "Connections"
+          },
+          "conditions": {
+            "$ref": "#/components/schemas/VoyageConditions"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "source",
+          "target",
+          "departure_at"
+        ],
+        "title": "VoyageRequest"
+      },
+      "VoyageResponse": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "request": {
+            "$ref": "#/components/schemas/VoyageRequest"
+          },
+          "conditions": {
+            "$ref": "#/components/schemas/VoyageConditions"
+          },
+          "baseline": {
+            "$ref": "#/components/schemas/VoyageSnapshot"
+          },
+          "current": {
+            "$ref": "#/components/schemas/VoyageSnapshot"
+          },
+          "eta_change_hours": {
+            "type": "number",
+            "title": "Eta Change Hours"
+          },
+          "route_changed": {
+            "type": "boolean",
+            "title": "Route Changed"
+          },
+          "revision": {
+            "type": "integer",
+            "title": "Revision"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "id",
+          "request",
+          "conditions",
+          "baseline",
+          "current",
+          "eta_change_hours",
+          "route_changed",
+          "revision"
+        ],
+        "title": "VoyageResponse"
+      },
+      "VoyageSnapshot": {
+        "properties": {
+          "calculated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Calculated At"
+          },
+          "fastest": {
+            "$ref": "#/components/schemas/TimedRoute"
+          },
+          "eco": {
+            "$ref": "#/components/schemas/TimedRoute"
+          },
+          "excluded_reasons": {
+            "items": {
+              "$ref": "#/components/schemas/DelayReason"
+            },
+            "type": "array",
+            "title": "Excluded Reasons"
+          },
+          "alternative_reasons": {
+            "items": {
+              "$ref": "#/components/schemas/DelayReason"
+            },
+            "type": "array",
+            "title": "Alternative Reasons"
+          },
+          "training_data": {
+            "type": "string",
+            "const": "synthetic",
+            "title": "Training Data",
+            "default": "synthetic"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "calculated_at",
+          "fastest",
+          "eco",
+          "excluded_reasons"
+        ],
+        "title": "VoyageSnapshot"
+      },
+      "VoyageUpdate": {
+        "properties": {
+          "conditions": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/VoyageConditions"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "VoyageUpdate"
+      },
+      "WeatherForecast": {
+        "properties": {
+          "provider": {
+            "type": "string",
+            "const": "OpenWeather",
+            "title": "Provider",
+            "default": "OpenWeather"
+          },
+          "product": {
+            "type": "string",
+            "const": "5-day/3-hour",
+            "title": "Product",
+            "default": "5-day/3-hour"
+          },
+          "source_url": {
+            "type": "string",
+            "title": "Source Url",
+            "default": "https://openweathermap.org/api/forecast5"
+          },
+          "location": {
+            "$ref": "#/components/schemas/Coordinates"
+          },
+          "retrieved_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Retrieved At"
+          },
+          "step_hours": {
+            "type": "integer",
+            "const": 3,
+            "title": "Step Hours",
+            "default": 3
+          },
+          "cached": {
+            "type": "boolean",
+            "title": "Cached",
+            "default": false
+          },
+          "wave_height_available": {
+            "type": "boolean",
+            "const": false,
+            "title": "Wave Height Available",
+            "default": false
+          },
+          "forecasts": {
+            "items": {
+              "$ref": "#/components/schemas/ForecastSlot"
+            },
+            "type": "array",
+            "maxItems": 40,
+            "minItems": 1,
+            "title": "Forecasts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "location",
+          "retrieved_at",
+          "forecasts"
+        ],
+        "title": "WeatherForecast"
+      },
+      "WeatherImpact": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "scenario",
+              "openweather",
+              "manual"
+            ],
+            "title": "Source"
+          },
+          "severity": {
+            "type": "number",
+            "maximum": 10.0,
+            "minimum": 0.0,
+            "title": "Severity"
+          },
+          "wind_speed_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Speed Ms"
+          },
+          "wind_gust_ms": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wind Gust Ms"
+          },
+          "wave_height_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Height M"
+          },
+          "forecast_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Forecast At"
+          },
+          "retrieved_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retrieved At"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Coordinates"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "sea_restricted": {
+            "type": "boolean",
+            "title": "Sea Restricted",
+            "default": false
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "scope": {
+            "type": "string",
+            "const": "representative_point_all_sea_legs",
+            "title": "Scope",
+            "default": "representative_point_all_sea_legs"
+          },
+          "policy": {
+            "type": "string",
+            "title": "Policy",
+            "default": "demo-v1: wind/gust >= 20 m/s or waves > 2.5 m; not an official port closure"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "severity"
+        ],
+        "title": "WeatherImpact"
+      }
+    }
+  }
+}

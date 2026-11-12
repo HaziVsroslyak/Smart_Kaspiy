@@ -1,0 +1,17 @@
+name: smart-caspian-transit
+
+services:
+  backend:
+    environment:
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    ports:
+      - "127.0.0.1:8000:8000"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/openapi.json', timeout=5).close()"]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3

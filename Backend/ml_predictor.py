@@ -19,7 +19,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
 FEATURE_COLUMNS: tuple[str, ...] = (
-    "weather_severity", "port_congestion", "transport_mode", "season",
+    "weather_severity", "port_congestion", "transport_mode", "season", "road_congestion_percent", "road_condition_severity",
 )
 SEASONS: tuple[str, ...] = ("winter", "spring", "summer", "autumn")
 CITIES: tuple[str, ...] = ("Астрахань", "Махачкала", "Энзели")
@@ -32,7 +32,9 @@ class TransitFeatures(BaseModel):
 
     weather_severity: float = Field(ge=0, le=10)
     port_congestion: float = Field(ge=0, le=100)
-    transport_mode: Literal["ship", "rail"]
+    transport_mode: Literal["ship", "rail", "road"]
+    road_congestion_percent: float = Field(default=0, ge=0, le=100)
+    road_condition_severity: float = Field(default=0, ge=0, le=10)
     season: Literal["winter", "spring", "summer", "autumn"]
 
 
@@ -58,14 +60,17 @@ def generate_mock_data(random_state: int = 42) -> pd.DataFrame:
         origin, destination = rng.sample(CITIES, 2)
         weather = rng.uniform(0, 10)
         congestion = rng.uniform(0, 100)
-        mode = rng.choice(("ship", "rail"))
+        mode = rng.choice(("ship", "rail", "road"))
         season = rng.choice(SEASONS)
+        road_queue = rng.uniform(0, 100) if mode == "road" else 0.0
+        road_condition = rng.uniform(0, 10) if mode == "road" else 0.0
         # Ships are more weather-sensitive; high congestion has nonlinear cost.
         delay = (
             1.0
-            + weather * (1.8 if mode == "ship" else 0.65)
+            + weather * (1.8 if mode == "ship" else 0.9 if mode == "road" else 0.65)
             + 0.09 * congestion
             + 0.012 * max(0.0, congestion - 65.0) ** 2
+            + 0.12 * road_queue + 1.5 * road_condition
             + seasonal_delay[season]
             + (3.0 if mode == "ship" else 0.0)
             + rng.gauss(0.0, 1.5)
@@ -77,6 +82,8 @@ def generate_mock_data(random_state: int = 42) -> pd.DataFrame:
             "port_congestion": congestion,
             "transport_mode": mode,
             "season": season,
+            "road_congestion_percent": road_queue,
+            "road_condition_severity": road_condition,
             "delay_hours": max(0.0, delay),
         })
     return pd.DataFrame.from_records(records)
@@ -96,13 +103,17 @@ class TransitPredictor:
     def train(self, data: pd.DataFrame | None = None) -> TransitPredictor:
         """Fit on supplied trips, or generate the default synthetic dataset.
 
-        Only the four declared features are used; metadata is excluded.
+        Only the declared features are used; metadata is excluded.
         A failed retraining attempt leaves the previous model intact.
         """
         if data is None:
             data = generate_mock_data(self.random_state)
         if not isinstance(data, pd.DataFrame):
             raise TypeError("Training data must be a pandas DataFrame.")
+        data = data.copy()
+        for optional in ("road_congestion_percent", "road_condition_severity"):
+            if optional not in data.columns:
+                data[optional] = 0.0
         required = [*FEATURE_COLUMNS, "delay_hours"]
         if not data.columns.is_unique:
             raise ValueError("Training data contains duplicate columns.")
@@ -119,9 +130,9 @@ class TransitPredictor:
                 raise ValueError(f"Invalid training record at position {row_number}: {exc}") from exc
         frame = pd.DataFrame.from_records(validated)
         preprocessing = ColumnTransformer([
-            ("numeric", "passthrough", ["weather_severity", "port_congestion"]),
+            ("numeric", "passthrough", ["weather_severity", "port_congestion", "road_congestion_percent", "road_condition_severity"]),
             ("categorical", OneHotEncoder(
-                categories=[["ship", "rail"], list(SEASONS)],
+                categories=[["ship", "rail", "road"], list(SEASONS)],
                 handle_unknown="error",
             ), ["transport_mode", "season"]),
         ])

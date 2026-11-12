@@ -1,0 +1,23 @@
+.route-planner{display:grid;gap:22px}
+.connection-settings{border:1px solid #dce4e3;border-radius:6px;margin:0 0 20px;padding:14px}.connection-settings legend{font-size:11px;color:#637a82}.inline-check{display:flex;align-items:center;gap:8px}.inline-check input{width:auto;margin:0}.checkpoint-table{overflow:auto}
+.route-controls{min-height:0}
+.route-inputs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;align-items:end}
+.route-inputs .primary{margin:0 0 20px;min-height:45px}
+.route-inputs .hint{align-self:center;margin-top:0}
+.route-workspace{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(320px,1fr);gap:22px}
+.route-summary{min-width:0}
+.route-summary .route-line{margin-top:22px;line-height:1.9;font-size:14px}
+.route-summary .metrics{margin:20px 0}
+.route-summary .section-title button{border:1px solid #c7d8d7;background:#f3f8f6;border-radius:5px;padding:8px;color:#2c5861;font-size:11px}
+.route-legs{padding-left:20px;font-size:11px;line-height:1.9}
+.route-legs li{padding:8px 0}
+.route-legs small{display:block;color:#637a82}
+.route-ok,.route-change{padding:14px;border-radius:6px;background:#edf6ee;color:#346247;font-size:12px;line-height:1.8}
+.route-change{background:#eaf3f6;color:#295363}
+.map-legend{display:flex;gap:14px;flex-wrap:wrap;margin:16px 0;font-size:11px;color:#637a82}
+.map-legend .sea{color:#007f9c}.map-legend .rail{color:#b15b0e}
+.port-buttons button[aria-pressed=true]{background:#123a43;color:#fff;border-color:#123a43}
+@media(max-width:1250px){.route-workspace{grid-template-columns:1fr}.route-inputs{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.route-inputs{grid-template-columns:1fr 1fr;gap:12px}.route-inputs .primary{font-size:11px}.route-summary .metrics{gap:10px}.route-controls{padding:16px}}
+
+.transport-options{display:flex;gap:24px;flex-wrap:wrap;border:1px solid #dce4e3;border-radius:6px;margin:0 0 20px;padding:14px}.transport-options legend{font-size:11px;color:#637a82}.transport-options label{display:flex;gap:8px;align-items:center;margin:0}.transport-options input{width:auto;margin:0}

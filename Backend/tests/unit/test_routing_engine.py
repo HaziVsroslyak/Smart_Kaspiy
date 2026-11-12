@@ -36,7 +36,7 @@ class RoutingEngineTests(unittest.TestCase):
         graph = create_transport_graph()
         self.assertIsInstance(graph, nx.MultiDiGraph)
         self.assertEqual(set(graph), {"Астрахань", "Махачкала", "Энзели", "Решт"})
-        self.assertEqual(graph.number_of_edges("Махачкала", "Энзели"), 2)
+        self.assertEqual(graph.number_of_edges("Махачкала", "Энзели"), 3)
         for source, target, key, data in graph.edges(keys=True, data=True):
             self.assertTrue(graph.has_edge(target, source, key))
             for attribute in ("base_time_hours", "cost_usd", "co2_emissions_kg"):
@@ -45,8 +45,10 @@ class RoutingEngineTests(unittest.TestCase):
         self.assertEqual(len(create_transport_graph()), 4)
 
     def test_weather_changes_fastest_but_not_co2_objective(self) -> None:
-        calm = find_optimal_route("Махачкала", "Решт", WeatherPredictor(), 0)
-        storm = find_optimal_route("Махачкала", "Решт", WeatherPredictor(), 10)
+        network = create_transport_graph()
+        network.remove_edges_from([(u,v,k) for u,v,k,d in network.edges(keys=True,data=True) if d["transport_mode"] == "road"])
+        calm = find_optimal_route("Махачкала", "Решт", WeatherPredictor(), 0, graph=network)
+        storm = find_optimal_route("Махачкала", "Решт", WeatherPredictor(), 10, graph=network)
         self.assertEqual(calm["fastest"]["nodes"], ["Махачкала", "Энзели", "Решт"])
         self.assertEqual(storm["fastest"]["nodes"], ["Махачкала", "Решт"])
         self.assertEqual(calm["eco"]["nodes"], storm["eco"]["nodes"])
@@ -77,6 +79,7 @@ class RoutingEngineTests(unittest.TestCase):
         self.assertEqual(predictor.calls[0], {
             "weather_severity": 3.0, "port_congestion": 30.0,
             "transport_mode": "rail", "season": "winter",
+            "road_congestion_percent": 0.0, "road_condition_severity": 0.0,
         })
         self.assertTrue(nx.utils.graphs_equal(graph, before))
 

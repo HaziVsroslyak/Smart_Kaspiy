@@ -1,0 +1,60 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "departure_port": {
+      "enum": [
+        "Астрахань",
+        "Махачкала",
+        "Оля"
+      ],
+      "title": "Departure Port",
+      "type": "string"
+    },
+    "arrival_port": {
+      "enum": [
+        "Энзели",
+        "Амирабад"
+      ],
+      "title": "Arrival Port",
+      "type": "string"
+    },
+    "wind_speed_ms": {
+      "maximum": 25,
+      "minimum": 0,
+      "title": "Wind Speed Ms",
+      "type": "number"
+    },
+    "wave_height_m": {
+      "maximum": 4.5,
+      "minimum": 0.1,
+      "title": "Wave Height M",
+      "type": "number"
+    },
+    "port_congestion_percent": {
+      "maximum": 100,
+      "minimum": 10,
+      "title": "Port Congestion Percent",
+      "type": "number"
+    },
+    "season": {
+      "enum": [
+        "Winter",
+        "Spring",
+        "Summer",
+        "Autumn"
+      ],
+      "title": "Season",
+      "type": "string"
+    }
+  },
+  "required": [
+    "departure_port",
+    "arrival_port",
+    "wind_speed_ms",
+    "wave_height_m",
+    "port_congestion_percent",
+    "season"
+  ],
+  "title": "CaspianFeatures",
+  "type": "object"
+}

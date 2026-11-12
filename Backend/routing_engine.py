@@ -42,18 +42,22 @@ class _EdgeAttributes(BaseModel):
     base_time_hours: float = Field(ge=0)
     cost_usd: float = Field(ge=0)
     co2_emissions_kg: float = Field(ge=0)
-    transport_mode: Literal["ship", "rail"]
+    transport_mode: Literal["ship", "rail", "road"]
     port_congestion: float = Field(ge=0, le=100)
+    road_congestion_percent: float = Field(default=0, ge=0, le=100)
+    road_condition_severity: float = Field(default=0, ge=0, le=10)
+    border_wait_hours: float = Field(default=0, ge=0, le=504)
 
 
 class RouteSegment(TypedDict):
     source: str
     target: str
     edge_id: str | int
-    transport_mode: Literal["ship", "rail"]
+    transport_mode: Literal["ship", "rail", "road"]
     base_time_hours: float
     delay_hours: float
     expected_time_hours: float
+    border_wait_hours: float
     cost_usd: float
     co2_emissions_kg: float
 
@@ -93,6 +97,9 @@ def create_transport_graph() -> nx.MultiDiGraph:
         ("Махачкала", "Энзели", "rail", 46.0, 900.0, 65.0, 30.0),
         ("Махачкала", "Решт", "rail", 48.0, 950.0, 70.0, 25.0),
         ("Энзели", "Решт", "rail", 2.0, 100.0, 8.0, 20.0),
+        ("Астрахань", "Махачкала", "road", 12.0, 550.0, 160.0, 20.0),
+        ("Махачкала", "Энзели", "road", 32.0, 800.0, 250.0, 25.0),
+        ("Энзели", "Решт", "road", 1.0, 80.0, 15.0, 20.0),
     ]
     for source, target, mode, hours, cost, co2, congestion in links:
         for start, end in ((source, target), (target, source)):
@@ -100,6 +107,8 @@ def create_transport_graph() -> nx.MultiDiGraph:
                 start, end, key=mode, transport_mode=mode,
                 base_time_hours=hours, cost_usd=cost,
                 co2_emissions_kg=co2, port_congestion=congestion,
+                border_crossings=3 if mode == "road" and {source,target} == {"Махачкала","Энзели"} else 0,
+                border_wait_hours=12.0 if mode == "road" and {source,target} == {"Махачкала","Энзели"} else 0.0,
             )
     return graph
 
@@ -172,6 +181,8 @@ def find_optimal_route(
             port_congestion=attributes.port_congestion,
             transport_mode=attributes.transport_mode,
             season=context.season,
+            road_congestion_percent=attributes.road_congestion_percent,
+            road_condition_severity=attributes.road_condition_severity,
         )
         try:
             raw_delay = predictor.predict_delay(features.model_dump())
@@ -182,6 +193,7 @@ def find_optimal_route(
                 raise ValueError("Delay must be finite and nonnegative.")
         except Exception as exc:
             raise PredictionError(f"Prediction failed for {start} -> {end} ({key}).") from exc
+        delay += attributes.border_wait_hours
         expected_time = attributes.base_time_hours + delay
         if not math.isfinite(expected_time):
             raise PredictionError(f"Expected time overflow for {start} -> {end} ({key}).")
@@ -190,6 +202,7 @@ def find_optimal_route(
             "transport_mode": attributes.transport_mode,
             "base_time_hours": attributes.base_time_hours,
             "delay_hours": delay, "expected_time_hours": expected_time,
+            "border_wait_hours": attributes.border_wait_hours,
             "cost_usd": attributes.cost_usd,
             "co2_emissions_kg": attributes.co2_emissions_kg,
         }

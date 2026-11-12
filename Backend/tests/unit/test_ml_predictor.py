@@ -33,13 +33,21 @@ class TransitPredictorTests(unittest.TestCase):
         self.assertTrue((self.data.origin != self.data.destination).all())
         self.assertEqual(set(self.data.origin), set(CITIES))
         self.assertEqual(set(self.data.destination), set(CITIES))
-        self.assertEqual(set(self.data.transport_mode), {"ship", "rail"})
+        self.assertEqual(set(self.data.transport_mode), {"ship", "rail", "road"})
         self.assertEqual(set(self.data.season), {"winter", "spring", "summer", "autumn"})
         self.assertFalse(self.data.isna().any().any())
 
     def test_untrained_model(self) -> None:
         with self.assertRaises(ModelNotTrainedError):
             TransitPredictor().predict_delay(self._features())
+
+    def test_road_prediction_responds_to_road_conditions(self) -> None:
+        features = {**self._features(), "transport_mode": "road", "weather_severity": 1,
+                    "road_congestion_percent": 0, "road_condition_severity": 0}
+        free = self.predictor.predict_delay(features)
+        congested = self.predictor.predict_delay({**features, "road_congestion_percent": 100,
+                                                  "road_condition_severity": 10})
+        self.assertGreater(congested, free + 5)
 
     @staticmethod
     def _features() -> dict[str, object]:
