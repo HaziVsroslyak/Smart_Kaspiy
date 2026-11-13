@@ -5,6 +5,7 @@ import * as L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {api} from '../api/client';
 import type {ForecastRouteWeather, WeatherForecast} from '../api/client';
+import {addRussianBasemap} from '../maps/russianBasemap';
 
 // Approximate city control points, not berth coordinates or a navigation chart.
 const locations = [
@@ -55,11 +56,7 @@ export function WeatherMap({onApplyWeather}:{onApplyWeather:(weather:ForecastRou
     if(!host.current)return;
     const instance=L.map(host.current,{scrollWheelZoom:false}).setView([41.5,50.5],5);
     map.current=instance;
-    const tiles=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      maxZoom:12,minZoom:3,
-    }).addTo(instance);
-    tiles.on('tileerror',()=>setTileError(true));
+    const removeBasemap=addRussianBasemap(instance,()=>setTileError(true));
     locations.forEach(place=>{
       const icon=L.divIcon({className:'port-pin',html:'<span>●</span>',iconSize:[24,24],iconAnchor:[12,12]});
       L.marker([place.lat,place.lon],{icon,title:place.name,keyboard:true})
@@ -70,7 +67,7 @@ export function WeatherMap({onApplyWeather}:{onApplyWeather:(weather:ForecastRou
       Number(event.latlng.lat.toFixed(4)),Number(event.latlng.lng.toFixed(4)),
     ));
     const observer=new ResizeObserver(()=>instance.invalidateSize());observer.observe(host.current);
-    return ()=>{activeRequest.current?.abort();observer.disconnect();instance.remove();map.current=null;};
+    return ()=>{activeRequest.current?.abort();observer.disconnect();removeBasemap();instance.remove();map.current=null;};
   },[]);
 
   useEffect(()=>{

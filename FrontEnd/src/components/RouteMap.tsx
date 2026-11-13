@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css';
 import type {RouteDetails, WeatherImpact} from '../api/client';
 import {terminals,seaGates,segmentGeometry} from '../data/routeGeometry';
 import type {Checkpoint} from '../api/voyages';
+import {addRussianBasemap} from '../maps/russianBasemap';
 
 export function RouteMap({route,previous,weather,checkpoints=[],offline=false,vessel}:{route:RouteDetails|null;previous:RouteDetails|null;weather:WeatherImpact|null;checkpoints?:Checkpoint[];offline?:boolean;vessel?:{latitude:number;longitude:number;label:string}|null}) {
   const host=useRef<HTMLDivElement>(null);
@@ -15,6 +16,7 @@ export function RouteMap({route,previous,weather,checkpoints=[],offline=false,ve
     setTileError(false);
     const instance=L.map(host.current,{scrollWheelZoom:false}).setView([41.5,49],5);
     map.current=instance;
+    let removeBasemap=()=>{};
     if(offline){
       instance.getContainer().style.background='#e5e2d8';
       void import('../data/caspian-water.json').then(({default:water})=>{
@@ -23,12 +25,10 @@ export function RouteMap({route,previous,weather,checkpoints=[],offline=false,ve
         L.polygon(rings,{color:'#8aadb3',weight:1,fillColor:'#cce7ee',fillOpacity:1,interactive:false}).addTo(instance).bringToBack();
       });
       instance.attributionControl.addAttribution('Локальная схема Natural Earth · public domain');
-    }else L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-      attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:12,minZoom:3,
-    }).on('tileerror',()=>setTileError(true)).addTo(instance);
+    }else removeBasemap=addRussianBasemap(instance,()=>setTileError(true));
     layers.current=L.layerGroup().addTo(instance);
     const observer=new ResizeObserver(()=>instance.invalidateSize());observer.observe(host.current);
-    return ()=>{observer.disconnect();instance.remove();map.current=null;layers.current=null;};
+    return ()=>{observer.disconnect();removeBasemap();instance.remove();map.current=null;layers.current=null;};
   },[offline]);
   useEffect(()=>{
     const group=layers.current, instance=map.current;
