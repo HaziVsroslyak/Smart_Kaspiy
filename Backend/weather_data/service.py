@@ -97,8 +97,9 @@ def add_marine_waves(payload:FetchRequest, rows:list[dict])->dict:
         metadata.update(wave_grid_latitude=grid.latitude,wave_grid_longitude=grid.longitude)
         if distance_km(grid,requested)>25 or distance_km(grid,atmosphere)>25:
             raise ValueError('Marine grid is outside the 25 km coverage tolerance.')
-        if data.get('hourly_units',{}).get('wave_height')!='m':
-            raise ValueError('Marine wave height unit must be metres.')
+        units=data.get('hourly_units',{})
+        if units.get('wave_height')!='m' or units.get('wave_period')!='s' or units.get('wave_direction') not in ('°','degrees','deg'):
+            raise ValueError('Unexpected marine units; expected metres, seconds and degrees.')
         hourly=data['hourly'];times=hourly['time']
         mapping={'wave_height_m':'wave_height','wave_period_s':'wave_period','wave_direction_deg':'wave_direction'}
         if not isinstance(times,list) or not times or len(times)>20000:

@@ -20,7 +20,7 @@ class MarineWaveTests(unittest.TestCase):
             'wind_speed_10m':[5,6]}}
 
     def marine(self, heights=None):
-        return {'latitude':41.208,'longitude':51.208,'hourly_units':{'wave_height':'m'},
+        return {'latitude':41.208,'longitude':51.208,'hourly_units':{'wave_height':'m','wave_period':'s','wave_direction':'°'},
             'hourly':{'time':['2026-11-13T01:00','2026-11-13T02:00'],
                 'wave_height':heights if heights is not None else [1.2,1.4],
                 'wave_period':[4.0,4.2],'wave_direction':[150,160]}}
