@@ -55,6 +55,7 @@ export function WeatherMap({onApplyWeather}:{onApplyWeather:(weather:ForecastRou
   useEffect(()=>{
     if(!host.current)return;
     const instance=L.map(host.current,{scrollWheelZoom:false}).setView([41.5,50.5],5);
+    instance.attributionControl.setPrefix(false);
     map.current=instance;
     const removeBasemap=addRussianBasemap(instance,()=>setTileError(true));
     locations.forEach(place=>{

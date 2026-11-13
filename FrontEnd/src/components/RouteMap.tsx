@@ -15,6 +15,7 @@ export function RouteMap({route,previous,weather,checkpoints=[],offline=false,ve
     if(!host.current)return;
     setTileError(false);
     const instance=L.map(host.current,{scrollWheelZoom:false}).setView([41.5,49],5);
+    instance.attributionControl.setPrefix(false);
     map.current=instance;
     let removeBasemap=()=>{};
     if(offline){
