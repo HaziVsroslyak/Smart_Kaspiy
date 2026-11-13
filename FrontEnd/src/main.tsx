@@ -4,6 +4,7 @@ import {createRoot} from 'react-dom/client';
 import {api, clearCustoms} from './api/client';
 import type {ApiResult, CustomsResponse, ForecastRouteWeather} from './api/client';
 import {WeatherMap} from './components/WeatherMap';
+import {HeaderControls} from './components/HeaderControls';
 import {JITPlanner} from './components/JITPlanner';
 import {VoyagePlanner as RoutePlanner} from './components/VoyagePlanner';
 import './style.css';
@@ -44,12 +45,13 @@ function App() {
   }catch(err){setError(err instanceof Error?err.message:'Не удалось создать пример');}finally{setBusy(false);}
  }
  return <div className="shell">
-  <aside><a className="brand" href="#">◈ <span>CASPIAN<small>TRANSIT CONTROL</small></span></a><div className="nav-label">ОПЕРАЦИОННЫЙ ЦЕНТР</div>
+  <aside><a className="brand" href="#"><span className="brand-logo-box" aria-hidden="true">◈</span><span>CASPIAN TRANSIT<small>TRANSIT CONTROL</small></span></a><div className="nav-label">ОПЕРАЦИОННЫЙ ЦЕНТР</div>
+   <HeaderControls/>
    <nav>{titles.map((title,i)=><button disabled={busy} className={tab===i?'active':''} onClick={()=>changeTab(i)} key={title}><span>0{i+1}</span>{title}<b>↗</b></button>)}</nav>
-   <div className="aside-bottom"><span className="dot"/> Север — Юг<br/><small>Цифровой двойник · MVP</small></div>
+   <div className="aside-bottom"><span className="dot"/> МТК СЕВЕР — ЮГ / КАСПИЙ<small>Цифровой двойник · MVP</small></div>
   </aside>
   <main><header><span>МТК СЕВЕР — ЮГ / КАСПИЙ</span><a href={`${api.defaults.baseURL}/docs`} target="_blank" rel="noreferrer">API документация ↗</a></header>
-   <section className="intro"><div><p className="eyebrow">SMART CASPIAN TRANSIT</p><h1>{['Движение без ожидания.','Груз готов к прибытию.','Меньше скорости. Больше смысла.','Погода по курсу.'][tab]}</h1><p>{['Рассчитайте маршрут с учетом погодных задержек.','Проверьте целостность данных груза до прибытия в порт.','Согласуйте прибытие судна с освобождением причала.','Прогноз OpenWeather на 5 суток с шагом 3 часа.'][tab]}</p></div><div className="edition">КАСПИЙСКИЙ<br/>КОРИДОР <strong>01—05</strong></div></section>
+   <section className="intro"><div><p className="eyebrow">SMART CASPIAN TRANSIT</p><h1>{['Движение без ожидания.','Таможенный коридор.','Точно в срок (JIT).','Метеомониторинг Каспия.'][tab]}</h1><p>{['Рассчитайте мультимодальный маршрут с учётом погодных задержек и портовых окон.','Проверьте целостность данных груза до прибытия в порт.','Согласуйте прибытие судна с освобождением причала.','Прогноз OpenWeather, погодные наборы и волны Open-Meteo Marine.'][tab]}</p></div><div className="edition">КАСПИЙСКИЙ<br/>КОРИДОР <strong>0{tab+1}—04</strong></div></section>
    {/* Keep the planner mounted so weather selection preserves route inputs and comparison. */}
    <div hidden={tab!==0}><RoutePlanner incomingWeather={routeWeather} onOpenWeather={()=>changeTab(3)}/></div>
    {tab===3&&<WeatherMap onApplyWeather={value=>{setRouteWeather(value);changeTab(0);}}/>}

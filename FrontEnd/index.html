@@ -3,131 +3,19 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <meta name="color-scheme" content="light dark"/>
   <title>Smart Caspian Transit — Операционный центр</title>
-  <style>.leaflet-control-attribution svg { display: none !important; }</style>
+  <script>
+    try {
+      const theme = localStorage.getItem('caspian_theme');
+      document.documentElement.dataset.theme = theme === 'dark' ? 'dark' : 'light';
+    } catch {
+      document.documentElement.dataset.theme = 'light';
+    }
+  </script>
 </head>
 <body>
   <div id="root"></div>
-
-  <!-- Для dev-режима Vite оставь строку ниже.
-       Если меняешь уже собранный билд (dist), замени её на свои теги из билда:
-       <script type="module" crossorigin src="/assets/index-Beudp7qT.js"></script>
-       <link rel="stylesheet" crossorigin href="/assets/index-BCapUJ_7.css"> -->
   <script type="module" src="/src/main.tsx"></script>
-
-  <script>
-    (function () {
-      const HEALTH_URL = '/api/v1/health';
-      const savedTheme = localStorage.getItem('caspian_theme') || 'light';
-      document.documentElement.setAttribute('data-theme', savedTheme);
-
-      async function checkBackendHealth() {
-        const indicator = document.getElementById('statusIndicator');
-        const statusText = document.getElementById('statusText');
-        const tooltipPing = document.getElementById('tooltipPing');
-        const tooltipUrl = document.getElementById('tooltipUrl');
-        if (!indicator) return;
-
-        tooltipUrl.textContent = HEALTH_URL;
-        const startTime = performance.now();
-
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 3500);
-          const response = await fetch(HEALTH_URL, { method: 'GET', signal: controller.signal });
-          clearTimeout(timeoutId);
-
-          const pingTime = Math.round(performance.now() - startTime);
-          tooltipPing.textContent = pingTime + ' мс';
-
-          if (response.ok) {
-            indicator.className = 'status-indicator status-green';
-            statusText.textContent = 'Сервер: активен';
-          } else {
-            indicator.className = 'status-indicator status-yellow';
-            statusText.textContent = 'Сервер: сбой (HTTP ' + response.status + ')';
-          }
-        } catch (err) {
-          const pingTime = Math.round(performance.now() - startTime);
-          tooltipPing.textContent = pingTime + ' мс (таймаут)';
-          indicator.className = 'status-indicator status-red';
-          statusText.textContent = 'Сервер: не отвечает';
-        }
-      }
-
-      function mountTopbarEnhancements() {
-        const aside = document.querySelector('.shell > aside');
-        if (!aside || document.getElementById('topbarRightInjected')) return;
-
-        // 1. Добавляем квадратный логотип-ромб в .brand
-        const brand = aside.querySelector('.brand');
-        if (brand && !brand.querySelector('.brand-logo-box')) {
-          const logoBox = document.createElement('div');
-          logoBox.className = 'brand-logo-box';
-          logoBox.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L22 12L12 22L2 12L12 2Z" stroke="currentColor" stroke-width="2.2"/><path d="M12 7L17 12L12 17L7 12L12 7Z" fill="currentColor"/></svg>';
-          brand.insertBefore(logoBox, brand.firstChild);
-        }
-
-        // 2. Создаём правый блок шапки (индикатор сервера + смена темы + ссылка на API)
-        const apiAnchor = document.querySelector('main > header a');
-        const apiHref = apiAnchor ? apiAnchor.getAttribute('href') : '/docs';
-
-        const rightBox = document.createElement('div');
-        rightBox.className = 'topbar-right';
-        rightBox.id = 'topbarRightInjected';
-        rightBox.innerHTML = `
-          <div class="backend-status-wrapper" id="backendStatusWrapper">
-            <div class="status-indicator" id="statusIndicator">
-              <span class="pulse-dot"></span>
-              <span id="statusText">Сервер: проверка...</span>
-            </div>
-            <div class="status-tooltip" id="statusTooltip">
-              <div class="tooltip-title">Статус сервера</div>
-              <div class="tooltip-row">
-                <span>Пинг:</span>
-                <span id="tooltipPing">—</span>
-              </div>
-              <div class="tooltip-endpoint">
-                <span>Эндпоинт:</span>
-                <code id="tooltipUrl">${HEALTH_URL}</code>
-              </div>
-            </div>
-          </div>
-
-          <button type="button" class="theme-toggle-btn" id="themeToggleBtn" title="Сменить тему">
-            <svg class="sun-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="5"/>
-              <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2m-4.22-7.78l1.42-1.42M6.34 17.66l-1.42 1.42"/>
-            </svg>
-            <svg class="moon-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-            </svg>
-          </button>
-
-          <a href="${apiHref}" target="_blank" rel="noreferrer" class="api-link">
-            API документация <span>↗</span>
-          </a>
-        `;
-
-        aside.appendChild(rightBox);
-
-        // 3. Обработчик смены темы
-        document.getElementById('themeToggleBtn').addEventListener('click', () => {
-          const htmlEl = document.documentElement;
-          const nextTheme = htmlEl.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-          htmlEl.setAttribute('data-theme', nextTheme);
-          localStorage.setItem('caspian_theme', nextTheme);
-        });
-
-        // 4. Запуск проверки бэкенда
-        checkBackendHealth();
-        setInterval(checkBackendHealth, 30000);
-      }
-
-      const observer = new MutationObserver(mountTopbarEnhancements);
-      observer.observe(document.getElementById('root'), { childList: true, subtree: true });
-      window.addEventListener('DOMContentLoaded', mountTopbarEnhancements);
-    })();
-  </script>
 </body>
 </html>

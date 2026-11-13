@@ -1,1 +1,32 @@
-.auth-page{min-height:100vh;display:grid;place-items:center;background:#edf2f2;padding:24px}.auth-card{width:min(440px,100%);padding:32px}.auth-card h1{font-size:28px}.auth-card form,.auth-admin form{display:grid;gap:12px}.auth-card label,.auth-admin label{display:grid;gap:6px}.auth-bar{display:flex;align-items:center;gap:16px;justify-content:flex-end;padding:8px 24px;background:#123d46;color:white}.auth-bar button{padding:6px 14px}.auth-admin{padding:12px 24px;background:#f7fafa;border-bottom:1px solid #c9d8dc}.auth-admin summary{cursor:pointer}.auth-admin-content{padding:16px 0;max-width:1000px}.auth-admin form{max-width:440px;margin:20px 0}.auth-admin ul{padding:0;list-style:none}.auth-admin li{padding:12px 0;border-bottom:1px solid #d8e1e3;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.auth-admin li button{padding:6px 10px}.auth-admin select{max-width:100%}
+/* Authentication and administration share the application theme in both modes. */
+.auth-page{min-height:100vh;display:grid;place-items:center;background:var(--bg-page);color:var(--text-main);padding:24px}
+.auth-card{width:min(440px,100%);min-width:0;padding:32px;background:var(--bg-card);color:var(--text-main)}
+.auth-card h1{font-size:28px;overflow-wrap:anywhere}
+.auth-card form,.auth-admin form{display:grid;gap:12px;min-width:0}
+.auth-card label,.auth-admin label{display:grid;gap:6px;color:var(--text-secondary);min-width:0;margin:0}
+.auth-card input,.auth-admin input,.auth-admin select{min-width:0;max-width:100%;background:var(--bg-input);color:var(--text-main);border:1px solid var(--border-light);margin-top:0;min-height:44px}
+.auth-card button,.auth-admin button,.auth-bar button{min-height:44px;padding:10px 16px;border:1px solid var(--border-light);background:var(--btn-primary-bg);color:#fff;font:inherit;line-height:1.4;white-space:normal;overflow-wrap:anywhere;max-width:100%}
+.auth-card button:hover,.auth-admin button:hover,.auth-bar button:hover{background:var(--btn-primary-hover)}
+.auth-card button:focus-visible,.auth-admin button:focus-visible,.auth-bar button:focus-visible{outline:2px solid var(--border-focus);outline-offset:3px}
+.auth-bar{display:flex;align-items:center;flex-wrap:wrap;gap:12px;justify-content:flex-end;padding:10px 24px;background:var(--bg-card);color:var(--text-main);border-bottom:1px solid var(--border-light);min-width:0}
+.auth-bar span{overflow-wrap:anywhere;min-width:0}
+.auth-admin{padding:16px 24px;background:var(--bg-card);color:var(--text-main);border-bottom:1px solid var(--border-light);min-width:0}
+.auth-admin summary{cursor:pointer;font-weight:600;min-height:32px;color:var(--text-main);overflow-wrap:anywhere}
+.auth-admin-content{padding:16px 0;max-width:1000px;min-width:0}
+.auth-admin h2,.auth-admin p,.auth-admin strong{color:var(--text-main);overflow-wrap:anywhere}
+.auth-admin form{width:100%;max-width:440px;margin:20px 0}
+.auth-admin ul{padding:0;list-style:none;min-width:0}
+.auth-admin li{padding:16px 0;border-bottom:1px solid var(--border-light);display:flex;gap:10px;align-items:center;flex-wrap:wrap;min-width:0;overflow-wrap:anywhere}
+.auth-admin li button{padding:8px 12px}
+.auth-admin li select{width:auto;flex:0 1 200px}
+.auth-admin select{max-width:100%;text-overflow:ellipsis}
+@media(max-width:600px){
+ .auth-page{padding:16px}
+ .auth-card{padding:24px 18px}
+ .auth-card h1{font-size:24px}
+ .auth-bar,.auth-admin{padding:12px 16px}
+ .auth-admin-content{width:100%}
+ .auth-admin li{display:grid;grid-template-columns:minmax(0,1fr)}
+ .auth-admin li select,.auth-admin li button,.auth-admin form>button{width:100%}
+ .auth-admin input,.auth-admin select,.auth-card input{font-size:16px}
+}
