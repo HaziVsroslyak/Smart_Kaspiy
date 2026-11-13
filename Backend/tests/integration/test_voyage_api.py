@@ -3,7 +3,7 @@ import unittest
 from datetime import datetime,timedelta,timezone
 from pathlib import Path
 from unittest.mock import patch
-from fastapi.testclient import TestClient
+from secure_client import SecureClient as TestClient
 from main import app
 from voyage_store import VoyageStore
 
@@ -11,7 +11,7 @@ class VoyageApiTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.folder=tempfile.TemporaryDirectory();cls.client=TestClient(app);cls.client.__enter__()
-        cls.store_patch=patch.object(app.state,'voyages',VoyageStore(Path(cls.folder.name)/'test.sqlite3'));cls.store_patch.start()
+        cls.store_patch=patch.object(app.state,'voyages',app.state.voyages);cls.store_patch.start()
     @classmethod
     def tearDownClass(cls):
         cls.store_patch.stop();cls.client.__exit__(None,None,None);cls.folder.cleanup()

@@ -1,0 +1,167 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "episode_id": {
+      "title": "Episode Id",
+      "type": "string"
+    },
+    "shipment_id": {
+      "title": "Shipment Id",
+      "type": "string"
+    },
+    "scenario_id": {
+      "title": "Scenario Id",
+      "type": "string"
+    },
+    "decision_at": {
+      "format": "date-time",
+      "title": "Decision At",
+      "type": "string"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "title": "Issued At",
+      "type": "string"
+    },
+    "valid_at": {
+      "format": "date-time",
+      "title": "Valid At",
+      "type": "string"
+    },
+    "departure_port": {
+      "title": "Departure Port",
+      "type": "string"
+    },
+    "arrival_port": {
+      "title": "Arrival Port",
+      "type": "string"
+    },
+    "season": {
+      "title": "Season",
+      "type": "string"
+    },
+    "wind_speed_ms": {
+      "maximum": 25,
+      "minimum": 0,
+      "title": "Wind Speed Ms",
+      "type": "number"
+    },
+    "wave_height_m": {
+      "maximum": 4.5,
+      "minimum": 0.1,
+      "title": "Wave Height M",
+      "type": "number"
+    },
+    "port_congestion_percent": {
+      "maximum": 100,
+      "minimum": 10,
+      "title": "Port Congestion Percent",
+      "type": "number"
+    },
+    "road_congestion_percent": {
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Road Congestion Percent",
+      "type": "number"
+    },
+    "road_condition_severity": {
+      "maximum": 10,
+      "minimum": 0,
+      "title": "Road Condition Severity",
+      "type": "number"
+    },
+    "transport_mode": {
+      "title": "Transport Mode",
+      "type": "string"
+    },
+    "queue_units": {
+      "minimum": 0,
+      "title": "Queue Units",
+      "type": "number"
+    },
+    "service_hours": {
+      "exclusiveMinimum": 0,
+      "title": "Service Hours",
+      "type": "number"
+    },
+    "active_berths": {
+      "minimum": 1,
+      "title": "Active Berths",
+      "type": "integer"
+    },
+    "remaining_service_hours": {
+      "minimum": 0,
+      "title": "Remaining Service Hours",
+      "type": "number"
+    },
+    "distance_nm": {
+      "exclusiveMinimum": 0,
+      "title": "Distance Nm",
+      "type": "number"
+    },
+    "cargo_weight_tons": {
+      "exclusiveMinimum": 0,
+      "title": "Cargo Weight Tons",
+      "type": "number"
+    },
+    "sea_delay_hours": {
+      "minimum": 0,
+      "title": "Sea Delay Hours",
+      "type": "number"
+    },
+    "land_delay_hours": {
+      "minimum": 0,
+      "title": "Land Delay Hours",
+      "type": "number"
+    },
+    "berth_ready_hours": {
+      "minimum": 0,
+      "title": "Berth Ready Hours",
+      "type": "number"
+    },
+    "actual_arrival": {
+      "format": "date-time",
+      "title": "Actual Arrival",
+      "type": "string"
+    },
+    "source": {
+      "default": "synthetic",
+      "title": "Source",
+      "type": "string"
+    },
+    "data_version": {
+      "default": "caspian-episodes-v1",
+      "title": "Data Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "episode_id",
+    "shipment_id",
+    "scenario_id",
+    "decision_at",
+    "issued_at",
+    "valid_at",
+    "departure_port",
+    "arrival_port",
+    "season",
+    "wind_speed_ms",
+    "wave_height_m",
+    "port_congestion_percent",
+    "road_congestion_percent",
+    "road_condition_severity",
+    "transport_mode",
+    "queue_units",
+    "service_hours",
+    "active_berths",
+    "remaining_service_hours",
+    "distance_nm",
+    "cargo_weight_tons",
+    "sea_delay_hours",
+    "land_delay_hours",
+    "berth_ready_hours",
+    "actual_arrival"
+  ],
+  "title": "Episode",
+  "type": "object"
+}

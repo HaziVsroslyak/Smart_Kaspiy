@@ -1,0 +1,31 @@
+http://hazivsroslyak.mooo.com {
+    handle /.well-known/acme-challenge/* {
+        root * /var/www/certbot
+        file_server
+    }
+    handle {
+        redir https://hazivsroslyak.mooo.com{uri} permanent
+    }
+}
+
+https://hazivsroslyak.mooo.com {
+    tls /etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem /etc/letsencrypt/live/hazivsroslyak.mooo.com/privkey.pem
+    handle /api/* {
+        reverse_proxy backend:8000
+    }
+    handle /healthz {
+        reverse_proxy backend:8000
+    }
+    handle /docs* {
+        reverse_proxy backend:8000
+    }
+    handle /openapi.json {
+        reverse_proxy backend:8000
+    }
+    handle /redoc* {
+        reverse_proxy backend:8000
+    }
+    handle {
+        reverse_proxy frontend:80
+    }
+}

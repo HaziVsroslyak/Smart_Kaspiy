@@ -19,37 +19,27 @@ export interface ResultMeta { mode: 'live'|'mock'; warning?: string }
 export interface WeatherSlot {valid_at:string;temperature_c:number;wind_speed_ms:number;wind_direction_deg:number|null;wind_gust_ms:number|null;humidity_percent:number;pressure_hpa:number;precipitation_probability:number;rain_3h_mm:number;snow_3h_mm:number;description:string;wave_height_m:null}
 export interface WeatherForecast {provider:'OpenWeather';product:'5-day/3-hour';location:{latitude:number;longitude:number};retrieved_at:string;step_hours:3;cached:boolean;wave_height_available:false;forecasts:WeatherSlot[]}
 export type ApiResult<T> = T & {_meta: ResultMeta};
-export const api = axios.create({baseURL: import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000', timeout: 12000});
-
-function fallbackReason(error: unknown): string {
-  if (axios.isAxiosError(error) && error.response && error.response.status < 500) {
-    // Validation errors and missing routes must not look like successful mock calls.
-    throw new Error(`API ${error.response.status}: ${JSON.stringify(error.response.data.detail ?? error.response.data)}`);
-  }
-  return 'API недоступен. Показан фиксированный пример, не результат расчета ваших данных.';
+export const api = axios.create({baseURL: import.meta.env.VITE_API_BASE_URL || '', timeout: 12000, withCredentials:true});
+let csrfToken = '';
+export function setCsrfToken(value:string){csrfToken=value;}
+api.interceptors.request.use(config=>{
+ if(!['get','head','options'].includes((config.method??'get').toLowerCase())&&csrfToken)config.headers.set('X-CSRF-Token',csrfToken);
+ return config;
+});
+api.interceptors.response.use(response=>response,error=>{
+ if(error.response?.status===401){csrfToken='';if(typeof window!=='undefined')window.dispatchEvent(new Event('caspian-auth-expired'));}
+ return Promise.reject(error);
+});
+export async function calculateRoute(payload:RouteRequest):Promise<ApiResult<RouteResponse>>{
+ const {data}=await api.post<RouteResponse>('/api/v1/route/calculate',payload);return {...data,_meta:{mode:'live'}};
 }
-
-export async function calculateRoute(payload: RouteRequest): Promise<ApiResult<RouteResponse>> {
-  try { const {data} = await api.post<RouteResponse>('/api/v1/route/calculate', payload); return {...data, _meta:{mode:'live'}}; }
-  catch (error) {
-    const example:RouteDetails={nodes:['Махачкала','Энзели','Решт'],segments:[
-      {source:'Махачкала',target:'Энзели',edge_id:'ship',transport_mode:'ship',base_time_hours:20,delay_hours:16,expected_time_hours:36,cost_usd:500,co2_emissions_kg:140},
-      {source:'Энзели',target:'Решт',edge_id:'rail',transport_mode:'rail',base_time_hours:2,delay_hours:4.5,expected_time_hours:6.5,cost_usd:100,co2_emissions_kg:8},
-    ],total_base_time_hours:22,total_delay_hours:20.5,total_time_hours:42.5,total_cost_usd:600,total_co2_emissions_kg:148};
-    return {...example,eco:example,weather:{source:'manual',severity:0,wind_speed_ms:null,wind_gust_ms:null,wave_height_m:null,forecast_at:null,retrieved_at:null,location:null,sea_restricted:false,reasons:[],scope:'fixed_mock',policy:'fixed_mock'},_meta:{mode:'mock',warning:fallbackReason(error)}};
-  }
-}
-
 // The weather-driven planner must not display a canned route as a weather recalculation.
-export async function calculateWeatherRoute(payload:RouteRequest, signal?:AbortSignal):Promise<RouteResponse> {
-  const {data}=await api.post<RouteResponse>('/api/v1/route/calculate',payload,{signal});
-  return data;
+export async function calculateWeatherRoute(payload:RouteRequest,signal?:AbortSignal):Promise<RouteResponse>{
+ const {data}=await api.post<RouteResponse>('/api/v1/route/calculate',payload,{signal});return data;
 }
-export async function clearCustoms(payload: CustomsRequest|LegacyCustomsRequest): Promise<ApiResult<CustomsResponse>> {
-  try { const {data} = await api.post<CustomsResponse>('/api/v1/customs/clear', payload); return {...data, _meta:{mode:'live'}}; }
-  catch (error) { return {status:'Requires inspection',green_corridor:false,_meta:{mode:'mock',warning:fallbackReason(error)}}; }
+export async function clearCustoms(payload:CustomsRequest|LegacyCustomsRequest):Promise<ApiResult<CustomsResponse>>{
+ const {data}=await api.post<CustomsResponse>('/api/v1/customs/clear',payload);return {...data,_meta:{mode:'live'}};
 }
-export async function optimizeJIT(payload: JITRequest): Promise<ApiResult<JITResponse>> {
-  try { const {data} = await api.post<JITResponse>('/api/v1/optimize/jit', payload); return {...data, _meta:{mode:'live'}}; }
-  catch (error) { return {new_speed_knots:8,arrival_in_hours:15,berth_available_in_hours:15,remaining_wait_hours:0,baseline_fuel_tonnes:1.728,optimized_fuel_tonnes:0.768,fuel_saved_tonnes:0.96,co2_saved_tonnes:2.98944,fuel_coefficient:0.0001,_meta:{mode:'mock',warning:fallbackReason(error)}}; }
+export async function optimizeJIT(payload:JITRequest):Promise<ApiResult<JITResponse>>{
+ const {data}=await api.post<JITResponse>('/api/v1/optimize/jit',payload);return {...data,_meta:{mode:'live'}};
 }

@@ -1,3 +1,4 @@
+import {privateState} from '../auth/privateState';
 import {useEffect,useRef,useState} from 'react';
 import {apiErrorMessage} from '../api/errors';
 import type {ForecastRouteWeather,TransportMode} from '../api/client';
@@ -34,11 +35,11 @@ export function VoyagePlanner({incomingWeather,onOpenWeather}:{incomingWeather:F
  useEffect(()=>()=>request.current?.abort(),[]);
  function save(value:VoyageResponse){
   latest.current=value;setVoyage(value);
-  try{localStorage.setItem(STORAGE,value.id);}catch{/* Backend remains the authoritative store. */}
+  try{privateState.set(STORAGE,value.id);}catch{/* Backend remains the authoritative store. */}
  }
  useEffect(()=>{
   const controller=new AbortController();
-  let id:string|null=null;try{id=localStorage.getItem(STORAGE);}catch{}
+  let id:string|null=null;try{id=privateState.get(STORAGE)??null;}catch{}
   if(!id){setRestoring(false);return ()=>controller.abort();}
   getVoyage(id,controller.signal).then(value=>{
    if(controller.signal.aborted)return;
@@ -87,7 +88,7 @@ export function VoyagePlanner({incomingWeather,onOpenWeather}:{incomingWeather:F
  }
  function reset(){
   request.current?.abort();latest.current=null;setVoyage(null);setRevision(0);setError('');setBusy(false);
-  try{localStorage.removeItem(STORAGE);}catch{}
+  try{privateState.delete(STORAGE);}catch{}
  }
  function preset(wind:number,gust:number,wave:number){setConditions(old=>({...old,weather_mode:'scenario',scenario:{source:'scenario',wind_speed_ms:wind,wind_gust_ms:gust,wave_height_m:wave}}));}
  const current=voyage?.current[criterion]??null, baseline=voyage?.baseline[criterion]??null;

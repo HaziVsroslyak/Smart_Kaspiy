@@ -3,7 +3,7 @@ import json
 import unittest
 from datetime import datetime, timezone
 from unittest.mock import patch
-from fastapi.testclient import TestClient
+from secure_client import SecureClient as TestClient
 from main import app
 from weather_service import OpenWeatherService
 

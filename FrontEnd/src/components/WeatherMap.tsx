@@ -1,3 +1,4 @@
+import {WeatherDatasetPanel} from './WeatherDatasetPanel';
 import {useEffect, useRef, useState} from 'react';
 import axios from 'axios';
 import * as L from 'leaflet';
@@ -83,7 +84,7 @@ export function WeatherMap({onApplyWeather}:{onApplyWeather:(weather:ForecastRou
     return ()=>{badge.current?.remove();badge.current=null;};
   },[slot,forecast]);
 
-  return <section className="weather-layout">
+  return <section className="weather-layout"><WeatherDatasetPanel/>
     <section className="card map-card"><div className="section-title"><h2>Каспий · погодная обстановка</h2><span>ПРОГНОЗ ПО ТОЧКЕ</span></div>
       <div className="port-buttons">{locations.map(place=><button key={place.name} onClick={()=>load(place.lat,place.lon,place.name)}>{place.name}</button>)}</div>
       <div ref={host} className="caspian-map" aria-label="Карта Каспийского моря. Выберите порт кнопкой или точку кликом."/>

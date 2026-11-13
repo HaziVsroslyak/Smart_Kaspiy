@@ -5,7 +5,7 @@ import type {RouteDetails, WeatherImpact} from '../api/client';
 import {terminals,seaGates,segmentGeometry} from '../data/routeGeometry';
 import type {Checkpoint} from '../api/voyages';
 
-export function RouteMap({route,previous,weather,checkpoints=[]}:{route:RouteDetails|null;previous:RouteDetails|null;weather:WeatherImpact|null;checkpoints?:Checkpoint[]}) {
+export function RouteMap({route,previous,weather,checkpoints=[],offline=false,vessel}:{route:RouteDetails|null;previous:RouteDetails|null;weather:WeatherImpact|null;checkpoints?:Checkpoint[];offline?:boolean;vessel?:{latitude:number;longitude:number;label:string}|null}) {
   const host=useRef<HTMLDivElement>(null);
   const map=useRef<L.Map|null>(null);
   const layers=useRef<L.LayerGroup|null>(null);
@@ -14,13 +14,21 @@ export function RouteMap({route,previous,weather,checkpoints=[]}:{route:RouteDet
     if(!host.current)return;
     const instance=L.map(host.current,{scrollWheelZoom:false}).setView([41.5,49],5);
     map.current=instance;
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
+    if(offline){
+      instance.getContainer().style.background='#e5e2d8';
+      void import('../data/caspian-water.json').then(({default:water})=>{
+        if(map.current!==instance)return;
+        const rings=water.coordinates.map(ring=>ring.map(([lon,lat]):L.LatLngTuple=>[lat,lon]));
+        L.polygon(rings,{color:'#8aadb3',weight:1,fillColor:'#cce7ee',fillOpacity:1,interactive:false}).addTo(instance).bringToBack();
+      });
+      instance.attributionControl.addAttribution('Локальная схема Natural Earth · public domain');
+    }else L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{
       attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:12,minZoom:3,
     }).on('tileerror',()=>setTileError(true)).addTo(instance);
     layers.current=L.layerGroup().addTo(instance);
     const observer=new ResizeObserver(()=>instance.invalidateSize());observer.observe(host.current);
     return ()=>{observer.disconnect();instance.remove();map.current=null;layers.current=null;};
-  },[]);
+  },[offline]);
   useEffect(()=>{
     const group=layers.current, instance=map.current;
     if(!group||!instance)return;
@@ -64,13 +72,18 @@ export function RouteMap({route,previous,weather,checkpoints=[]}:{route:RouteDet
       L.circleMarker([cp.latitude,cp.longitude],{radius:8,color:cp.status==='outside_horizon'?'#a36b11':'#367d56',weight:2,fillOpacity:0.6})
         .bindTooltip(label).addTo(group);
     }
+    if(vessel){
+      const text=document.createElement('span');text.textContent=vessel.label;
+      L.circleMarker([vessel.latitude,vessel.longitude],{radius:9,color:'#123a43',fillColor:'#d4e9a7',fillOpacity:1,weight:3})
+        .bindTooltip(text,{permanent:true,direction:'right'}).addTo(group);
+    }
     if(route){
       const points=[...route.segments.flatMap(segmentGeometry),
         ...route.nodes.map(name=>terminals[name]).filter(point=>!!point)];
       if(points.length>1)instance.fitBounds(L.latLngBounds(points),{padding:[50,50],maxZoom:7});
       else if(points.length===1)instance.setView(points[0],7);
     }
-  },[route,previous,weather,checkpoints]);
+  },[route,previous,weather,checkpoints,offline,vessel]);
   return <><div ref={host} className="caspian-map route-map" aria-label="Схема маршрута на карте Каспия"/>
     <div className="map-legend"><span className="sea">━ Море</span><span className="rail">┄ Ж/д</span><span style={{color:'#7453b5'}}>━ Авто</span><span>┄ Серый: план для сравнения</span><span>● Погодные точки</span></div>
     {tileError&&<p className="warning">Подложка карты недоступна. Схема связей и список участков доступны.</p>}

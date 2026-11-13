@@ -1,0 +1,57 @@
+name: smart-caspian-transit
+services:
+  backend:
+    restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile
+    environment:
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY:-}
+      DATABASE_PATH: /app/artifacts/voyages.sqlite3
+      APP_ORIGINS: https://hazivsroslyak.mooo.com
+      FORWARDED_ALLOW_IPS: 172.30.11.10
+    volumes:
+      - backend_data:/app/artifacts
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=5).close()"]
+      interval: 20s
+      timeout: 10s
+      start_period: 180s
+      retries: 6
+  frontend:
+    restart: unless-stopped
+    build:
+      context: ..
+      dockerfile: Docker/Dockerfile.frontend
+      args:
+        VITE_API_BASE_URL: ''
+    depends_on:
+      backend:
+        condition: service_healthy
+  gateway:
+    restart: unless-stopped
+    image: caddy:2.10-alpine
+    networks:
+      default:
+        ipv4_address: 172.30.11.10
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile.production:/etc/caddy/Caddyfile:ro
+      - ${LETSENCRYPT_DIR:-/etc/letsencrypt}:/etc/letsencrypt:ro
+      - ${CERTBOT_WEBROOT:-/var/www/certbot}:/var/www/certbot:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - frontend
+      - backend
+volumes:
+  backend_data:
+  caddy_data:
+  caddy_config:
+networks:
+  default:
+    ipam:
+      config:
+        - subnet: 172.30.11.0/24

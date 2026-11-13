@@ -1,0 +1,22 @@
+import {useState} from 'react';
+import type {FormEvent} from 'react';
+import {api} from '../api/client';
+import {apiErrorMessage} from '../api/errors';
+import type {User} from './api';
+interface VoyageOwner {id:string;owner_id:string|null;ownership_revision:number}
+export function UserAdministration({user}:{user:User}){
+ const [users,setUsers]=useState<User[]>([]),[voyages,setVoyages]=useState<VoyageOwner[]>([]),[error,setError]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false);
+ async function run(action:()=>Promise<void>){setBusy(true);setError('');setNotice('');try{await action();}catch(err){setError(apiErrorMessage(err));}finally{setBusy(false);}}
+ async function refresh(){setUsers((await api.get<User[]>('/api/v1/admin/users')).data);if(user.role==='root')setVoyages((await api.get<VoyageOwner[]>('/api/v1/voyages')).data);}
+ function create(event:FormEvent<HTMLFormElement>){event.preventDefault();const form=event.currentTarget,data=new FormData(form);void run(async()=>{await api.post('/api/v1/admin/users',{login:String(data.get('login')),email:String(data.get('email')),password:String(data.get('password'))});form.reset();await refresh();setNotice('Аккаунт создан. Передайте временный пароль сотруднику защищённым способом.');});}
+ function transfer(event:FormEvent<HTMLFormElement>){event.preventDefault();const data=new FormData(event.currentTarget),voyage=voyages.find(item=>item.id===data.get('voyage'));if(!voyage)return;void run(async()=>{await api.post(`/api/v1/root/voyages/${encodeURIComponent(voyage.id)}/transfer`,{destination_user_id:String(data.get('destination')),expected_ownership_revision:voyage.ownership_revision});await refresh();setNotice('Рейс передан.');});}
+ return <details className="auth-admin"><summary onClick={()=>{if(!users.length)void run(refresh);}}>Управление пользователями {user.role==='root'?'и рейсами':''}</summary><div className="auth-admin-content">
+ <button disabled={busy} onClick={()=>void run(refresh)}>Обновить список</button>{error&&<p role="alert" className="error">{error}</p>}{notice&&<p role="status">{notice}</p>}
+ <form onSubmit={create}><h2>Новый логист</h2><label>Логин<input name="login" required/></label><label>Почта<input name="email" type="email" required/></label><label>Временный пароль<input name="password" type="password" minLength={12} autoComplete="new-password" required/></label><button disabled={busy}>Создать аккаунт</button></form>
+ <ul>{users.map(account=><li key={account.id}><strong>{account.login}</strong> · {account.email} · {account.role} · {account.status}
+ {(account.role==='logistician'||user.role==='root')&&account.id!==user.id&&<><button disabled={busy||account.status==='frozen'} onClick={()=>void run(async()=>{await api.post(`/api/v1/admin/users/${encodeURIComponent(account.id)}/freeze`,{});await refresh();})}>Заморозить</button><button disabled={busy} onClick={()=>void run(async()=>{const {data}=await api.post<{temporary_password:string}>(`/api/v1/admin/users/${encodeURIComponent(account.id)}/password-reset`,{});setNotice(`Временный пароль ${account.login}: ${data.temporary_password}. Скопируйте сейчас: повторно он не отображается.`);})}>Сбросить пароль</button></>}
+ {user.role==='root'&&account.id!==user.id&&<><select aria-label={`Роль ${account.login}`} value={account.role} disabled={busy} onChange={event=>{const role=event.target.value;void run(async()=>{await api.patch(`/api/v1/root/users/${encodeURIComponent(account.id)}/role`,{role});await refresh();});}}><option value="logistician">Логист</option><option value="admin">Администратор</option><option value="root">Root</option></select>{account.status==='frozen'&&<button disabled={busy} onClick={()=>void run(async()=>{await api.post(`/api/v1/root/users/${encodeURIComponent(account.id)}/unfreeze`,{});await refresh();})}>Разморозить</button>}</>}
+ </li>)}</ul>
+ {user.role==='root'&&<form onSubmit={transfer}><h2>Передать рейс</h2><label>Рейс<select name="voyage" required><option value="">Выберите рейс</option>{voyages.map(voyage=><option key={voyage.id} value={voyage.id}>{voyage.id} · {voyage.owner_id??'без владельца'}</option>)}</select></label><label>Новый логист<select name="destination" required><option value="">Выберите сотрудника</option>{users.filter(account=>account.role==='logistician'&&account.status==='active').map(account=><option key={account.id} value={account.id}>{account.login}</option>)}</select></label><button disabled={busy}>Передать</button></form>}
+ </div></details>;
+}

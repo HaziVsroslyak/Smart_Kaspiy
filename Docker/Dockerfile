@@ -10,6 +10,7 @@ COPY Backend/requirements.txt ./requirements.txt
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
 COPY --chown=10001:10001 Backend/ /app/
+RUN mkdir -p /app/artifacts && chown -R 10001:10001 /app/artifacts
 USER 10001:10001
 
 EXPOSE 8000

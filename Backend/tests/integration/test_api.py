@@ -2,7 +2,7 @@ import copy
 import unittest
 from unittest.mock import patch
 
-from fastapi.testclient import TestClient
+from secure_client import SecureClient as TestClient
 import networkx as nx
 
 from main import app
@@ -96,7 +96,7 @@ class ApiTests(unittest.TestCase):
 
     def test_service_errors(self) -> None:
         for error, status in [(RouteNotFoundError("No route"), 409), (PredictionError("internal"), 503), (InvalidGraphError("internal"), 500)]:
-            with self.subTest(status=status), patch("main.find_optimal_route", side_effect=error), patch("main.logger"):
+            with self.subTest(status=status), patch("api.routers.routing.find_optimal_route", side_effect=error), patch("api.routers.routing.logger"):
                 response = self.client.post("/api/v1/route/calculate", json=self.route_payload())
                 self.assertEqual(response.status_code, status)
                 self.assertNotIn("internal", response.text)
@@ -142,8 +142,8 @@ class ApiTests(unittest.TestCase):
         response = self.client.options("/api/v1/route/calculate", headers={
             "Origin": "https://example.com", "Access-Control-Request-Method": "POST",
         })
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.headers["access-control-allow-origin"], "*")
+        self.assertEqual(response.status_code, 400)
+        self.assertNotIn("access-control-allow-origin", response.headers)
         schema = self.client.get("/openapi.json").json()
         self.assertIn("/api/v1/customs/clear", schema["paths"])
         self.assertIn("/api/v1/route/calculate", schema["paths"])
