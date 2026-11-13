@@ -1,6 +1,6 @@
 import {api} from './client';
 export interface WeatherRecord {timestamp:string;latitude:number;longitude:number;wind_speed_ms:number|null;wave_height_m:number|null;wind_direction_deg:number|null;wind_gust_ms:number|null;temperature_c:number|null;precipitation_mm:number|null;surface_pressure_hpa:number|null;issued_at:string|null}
-export interface WeatherDataset {id:string;source_name:string;source_url:string|null;provenance:'uploaded_unverified'|'provider';retrieved_at:string;content_hash:string;kind:'upload'|'archive'|'forecast';records:WeatherRecord[]}
+export interface WeatherDataset {wave_source_url?:string|null;wave_fetch_status?:string;wave_fetch_detail?:string|null;id:string;source_name:string;source_url:string|null;provenance:'uploaded_unverified'|'provider';retrieved_at:string;content_hash:string;kind:'upload'|'archive'|'forecast';records:WeatherRecord[]}
 export async function importWeather(format:'csv'|'json',content:string,source_name:string,source_url?:string):Promise<WeatherDataset>{return (await api.post('/api/v1/weather/datasets/import',{format,content,source_name,...(source_url?{source_url}:{})})).data;}
 export async function fetchWeather(payload:{latitude:number;longitude:number;start_date:string;end_date:string;kind:'archive'|'forecast'}):Promise<WeatherDataset>{return (await api.post('/api/v1/weather/datasets/fetch',payload,{timeout:45000})).data;}
 export async function listWeather():Promise<WeatherDataset[]>{return (await api.get('/api/v1/weather/datasets')).data;}

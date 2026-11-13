@@ -14,6 +14,8 @@ class WeatherRecord(Contract):
     wind_gust_ms: float|None=Field(default=None,ge=0,le=200)
     wind_direction_deg: float|None=Field(default=None,ge=0,le=360)
     wave_height_m: float|None=Field(default=None,ge=0,le=40)
+    wave_period_s: float|None=Field(default=None,ge=0,le=60)
+    wave_direction_deg: float|None=Field(default=None,ge=0,le=360)
     temperature_c: float|None=Field(default=None,ge=-100,le=70)
     precipitation_mm: float|None=Field(default=None,ge=0,le=2000)
     surface_pressure_hpa: float|None=Field(default=None,ge=500,le=1200)
@@ -30,6 +32,11 @@ class Dataset(Contract):
     requested_latitude: float|None=None
     requested_longitude: float|None=None
     precipitation_interval_hours: float|None=None
+    wave_source_url: str|None=None
+    wave_fetch_status: Literal['complete','partial','unavailable','not_requested','not_applicable']='not_requested'
+    wave_fetch_detail: str|None=None
+    wave_grid_latitude: float|None=Field(default=None,ge=-90,le=90)
+    wave_grid_longitude: float|None=Field(default=None,ge=-180,le=180)
     records: list[WeatherRecord]
 
 class ImportRequest(Contract):
@@ -44,6 +51,7 @@ class FetchRequest(Contract):
     start_date: date
     end_date: date
     kind: Literal['archive','forecast']='archive'
+    include_waves: bool=True
 
 class ResolveRequest(Contract):
     latitude: float=Field(ge=-90,le=90)

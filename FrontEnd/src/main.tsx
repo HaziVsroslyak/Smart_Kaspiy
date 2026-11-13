@@ -1,5 +1,5 @@
 import {AuthGate} from './auth/AuthGate';
-import React, {useState} from 'react';
+import React, {useState, useRef} from 'react';
 import {createRoot} from 'react-dom/client';
 import {api, clearCustoms} from './api/client';
 import type {ApiResult, CustomsResponse, ForecastRouteWeather} from './api/client';
@@ -11,6 +11,8 @@ import './route.css';
 
 const titles = ['Маршрут','Таможня','JIT Arrival','Погода'];
 function App() {
+ const customsForm=useRef<HTMLFormElement>(null);
+ const [demoNotice,setDemoNotice]=useState('');
  const [tab,setTab]=useState(0), [busy,setBusy]=useState(false), [error,setError]=useState('');
  const [routeWeather,setRouteWeather]=useState<ForecastRouteWeather|null>(null);
  const [customs,setCustoms]=useState<ApiResult<CustomsResponse>|null>(null);
@@ -29,6 +31,18 @@ function App() {
   }catch(err){setError(err instanceof Error?err.message:'Ошибка запроса');}finally{setBusy(false);}
  }
  function changeTab(i:number){setTab(i);setError('');setRaw('');}
+ async function generateCargo(tampered:boolean){
+  setBusy(true);setError('');setCustoms(null);setRaw('');setDemoNotice('');
+  try{
+   const {data}=await api.get<{cargo_payload:{id:string;type:string;weight:number};provided_hash:string}>('/api/v1/customs/demo',{params:{tampered}});
+   const fields={...data.cargo_payload,hash:data.provided_hash};
+   for(const [name,value] of Object.entries(fields)){
+    const input=customsForm.current?.elements.namedItem(name);
+    if(input instanceof HTMLInputElement)input.value=String(value);
+   }
+   setDemoNotice(tampered?'Синтетический груз: вес увеличен на 100 кг после расчёта хеша. Ожидается проверка.':'Синтетический груз с корректным хешем. Ожидается зелёный коридор.');
+  }catch(err){setError(err instanceof Error?err.message:'Не удалось создать пример');}finally{setBusy(false);}
+ }
  return <div className="shell">
   <aside><a className="brand" href="#">◈ <span>CASPIAN<small>TRANSIT CONTROL</small></span></a><div className="nav-label">ОПЕРАЦИОННЫЙ ЦЕНТР</div>
    <nav>{titles.map((title,i)=><button disabled={busy} className={tab===i?'active':''} onClick={()=>changeTab(i)} key={title}><span>0{i+1}</span>{title}<b>↗</b></button>)}</nav>
@@ -41,7 +55,9 @@ function App() {
    {tab===3&&<WeatherMap onApplyWeather={value=>{setRouteWeather(value);changeTab(0);}}/>}
    {tab===2&&<JITPlanner/>}
    {tab===1&&<div className="workspace">
-    <section className="card form-card"><div className="section-title"><h2>{titles[tab]}</h2><span>ПАРАМЕТРЫ</span></div><form onSubmit={submit} key={tab}>
+    <section className="card form-card"><div className="section-title"><h2>{titles[tab]}</h2><span>ПАРАМЕТРЫ</span></div><form ref={customsForm} onSubmit={submit} key={tab}>
+     <div className="pair"><button type="button" disabled={busy} onClick={()=>void generateCargo(false)}>Случайный груз</button><button type="button" disabled={busy} onClick={()=>void generateCargo(true)}>Груз с подменой</button></div>
+     {demoNotice&&<p className="hint" role="status">{demoNotice} Нажмите «Проверить груз».</p>}
      <>
       <label>ID груза<input name="id" defaultValue="C-001" required maxLength={200}/></label>
       <div className="pair"><label>Тип<input name="type" defaultValue="Зерно" required maxLength={200}/></label><label>Вес · кг<input name="weight" type="number" min="0.001" step="any" defaultValue="100" required/></label></div>

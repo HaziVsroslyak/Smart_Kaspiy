@@ -42,6 +42,7 @@ export function JITPlanner(){
  const [catalog,setCatalog]=useState<DemoCatalog|null>(null),[scenarioId,setScenarioId]=useState('');
  const [result,setResult]=useState<DemoResult|null>(null),[strategyId,setStrategyId]=useState<StrategyResult['id']>('jit');
  const [progress,setProgress]=useState(0);
+ const [offlineMap,setOfflineMap]=useState(false);
  const [seed,setSeed]=useState(42),[manual,setManual]=useState(false);
  const [activeVoyageId]=useState(()=>{try{return privateState.get('caspian-active-voyage-v1');}catch{return null;}});
  const [wind,setWind]=useState(4),[wave,setWave]=useState(1),[congestion,setCongestion]=useState(50);
@@ -116,7 +117,8 @@ export function JITPlanner(){
    </section>
    <div className="route-workspace"><section className="card map-card"><div className="section-title"><h2>{strategy?.label??'Маршрут'}</h2><span>{strategy?statusLabels[strategy.status]:'ОЖИДАНИЕ'}</span></div>
     {strategy?.reason&&<p className={strategy.status==='ok'?'route-ok':'warning'}>{strategy.reason}</p>}
-    <RouteMap route={route} previous={baselineRoute} weather={null} checkpoints={checkpoints} offline={true} vessel={vessel}/>
+    <label className="inline-check"><input type="checkbox" checked={offlineMap} onChange={event=>setOfflineMap(event.target.checked)}/> Офлайн-схема вместо онлайн-карты</label>
+    <RouteMap route={route} previous={baselineRoute} weather={null} checkpoints={checkpoints} offline={offlineMap} vessel={vessel}/>
     {!route&&<p className="hint">Для выбранной стратегии нет рассчитанного пути. Серым может отображаться исходный план.</p>}
    </section><section className="card route-summary"><div className="section-title"><h2>Причины и прогнозы модели</h2><span>ПРИЗНАКИ ДОСТУПНЫ</span></div>
     {result.predictions.length?result.predictions.map((prediction,index)=><article className="jit-prediction" key={`${prediction.model_id}-${index}`}><b>{prediction.model_id}</b><p>{prediction.target}: <strong>{numeric(prediction.value_hours,'ч')}</strong></p><p className="hint">Оценочный интервал: {numeric(prediction.lower_hours)}–{numeric(prediction.upper_hours)} ч. Датасет: {prediction.data_version}.</p><details><summary>Признаки этого вызова</summary><pre>{JSON.stringify(prediction.features,null,2)}</pre></details></article>):<p className="hint">Модель не вызывалась: для этого случая отсутствуют необходимые признаки или применимый участок.</p>}

@@ -375,6 +375,47 @@
         }
       }
     },
+    "/api/v1/customs/demo": {
+      "get": {
+        "summary": "Generate Customs Demo",
+        "description": "Produce a synthetic manifest; tampering changes weight after hashing.",
+        "operationId": "generate_customs_demo_api_v1_customs_demo_get",
+        "parameters": [
+          {
+            "name": "tampered",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Tampered"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CustomsDemo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/customs/clear": {
       "post": {
         "summary": "Clear Customs",
@@ -1516,6 +1557,39 @@
         ],
         "title": "CreateUser"
       },
+      "CustomsDemo": {
+        "properties": {
+          "cargo_payload": {
+            "$ref": "#/components/schemas/CargoPayload"
+          },
+          "provided_hash": {
+            "type": "string",
+            "title": "Provided Hash"
+          },
+          "data_source": {
+            "type": "string",
+            "const": "synthetic",
+            "title": "Data Source",
+            "default": "synthetic"
+          },
+          "expected_status": {
+            "type": "string",
+            "enum": [
+              "Pre-cleared",
+              "Requires inspection"
+            ],
+            "title": "Expected Status"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "cargo_payload",
+          "provided_hash",
+          "expected_status"
+        ],
+        "title": "CustomsDemo"
+      },
       "CustomsRequest": {
         "properties": {
           "cargo_payload": {
@@ -1639,6 +1713,66 @@
               }
             ],
             "title": "Precipitation Interval Hours"
+          },
+          "wave_source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Source Url"
+          },
+          "wave_fetch_status": {
+            "type": "string",
+            "enum": [
+              "complete",
+              "partial",
+              "unavailable",
+              "not_requested",
+              "not_applicable"
+            ],
+            "title": "Wave Fetch Status",
+            "default": "not_requested"
+          },
+          "wave_fetch_detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Fetch Detail"
+          },
+          "wave_grid_latitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 90.0,
+                "minimum": -90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Grid Latitude"
+          },
+          "wave_grid_longitude": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 180.0,
+                "minimum": -180.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Grid Longitude"
           },
           "records": {
             "items": {
@@ -2174,6 +2308,11 @@
             ],
             "title": "Kind",
             "default": "archive"
+          },
+          "include_waves": {
+            "type": "boolean",
+            "title": "Include Waves",
+            "default": true
           }
         },
         "additionalProperties": false,
@@ -4180,6 +4319,32 @@
               }
             ],
             "title": "Wave Height M"
+          },
+          "wave_period_s": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 60.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Period S"
+          },
+          "wave_direction_deg": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 360.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Wave Direction Deg"
           },
           "temperature_c": {
             "anyOf": [

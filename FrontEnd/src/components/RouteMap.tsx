@@ -12,6 +12,7 @@ export function RouteMap({route,previous,weather,checkpoints=[],offline=false,ve
   const [tileError,setTileError]=useState(false);
   useEffect(()=>{
     if(!host.current)return;
+    setTileError(false);
     const instance=L.map(host.current,{scrollWheelZoom:false}).setView([41.5,49],5);
     map.current=instance;
     if(offline){

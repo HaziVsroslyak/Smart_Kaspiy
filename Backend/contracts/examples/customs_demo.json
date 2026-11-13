@@ -1,0 +1,52 @@
+[
+  {
+    "cargo_payload": {
+      "weight": 15637.0,
+      "type": "Оборудование",
+      "id": "DEMO-C36CA116"
+    },
+    "provided_hash": "ce36d62f4328de80f74b07eb586ce9e8ecd16a6479698ef1c3581cb060d2f276",
+    "data_source": "synthetic",
+    "expected_status": "Pre-cleared"
+  },
+  {
+    "cargo_payload": {
+      "weight": 22494.0,
+      "type": "Зерно",
+      "id": "DEMO-706BC8B8"
+    },
+    "provided_hash": "836fe3e9fabe086365ff5f0cb03c970839acf28533c2f45a2c2c2bcb25cc9566",
+    "data_source": "synthetic",
+    "expected_status": "Pre-cleared"
+  },
+  {
+    "cargo_payload": {
+      "weight": 12805.0,
+      "type": "Оборудование",
+      "id": "DEMO-A6C1923B"
+    },
+    "provided_hash": "d6f77addf0c53f07705568c00716c219f0a0ca14659a0bc1f36ef4a3cbfb7685",
+    "data_source": "synthetic",
+    "expected_status": "Pre-cleared"
+  },
+  {
+    "cargo_payload": {
+      "weight": 5498.0,
+      "type": "Зерно",
+      "id": "DEMO-81C1A0B1"
+    },
+    "provided_hash": "e347079434631d63533b51de7a59ea8b345899cc554580ee8496b1bd0cb3befb",
+    "data_source": "synthetic",
+    "expected_status": "Requires inspection"
+  },
+  {
+    "cargo_payload": {
+      "weight": 11593.0,
+      "type": "Фрукты",
+      "id": "DEMO-E3D5D81B"
+    },
+    "provided_hash": "988272c621568f4d86e4ca08fb49b4b952f3280765d908d509d6c4663ba4b0b1",
+    "data_source": "synthetic",
+    "expected_status": "Requires inspection"
+  }
+]
