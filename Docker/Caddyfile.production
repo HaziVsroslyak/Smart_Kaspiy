@@ -9,7 +9,7 @@ http://hazivsroslyak.mooo.com {
 }
 
 https://hazivsroslyak.mooo.com {
-    tls /etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem /etc/letsencrypt/live/hazivsroslyak.mooo.com/privkey.pem
+    tls {$TLS_CERT_FILE:/etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem} {$TLS_KEY_FILE:/etc/letsencrypt/live/hazivsroslyak.mooo.com/privkey.pem}
     handle /api/* {
         reverse_proxy backend:8000
     }

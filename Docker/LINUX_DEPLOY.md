@@ -16,7 +16,17 @@ curl --fail https://hazivsroslyak.mooo.com/healthz
 
 Open https://hazivsroslyak.mooo.com and sign in using the root credentials entered interactively. No password is provided by the repository. Admin can create accounts after login. Only gateway publishes ports; API and frontend use a private network. Backend trusts forwarded headers only from the gateway's fixed IP. If subnet 172.30.11.0/24 is occupied, change subnet, gateway IP and FORWARDED_ALLOW_IPS together.
 
-Certificate files must exist at `/etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem` and `privkey.pem`. Mounting the entire directory preserves Certbot's links to `archive/`. A certificate stored elsewhere needs the matching Caddyfile paths and directory mount. Never commit certificates, private keys or `.env.production`. Custom LETSENCRYPT_DIR requires checking the deploy script's preflight paths too.
+Certificate files default to `/etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem` and `privkey.pem`. Mounting the entire directory preserves Certbot's links to `archive/`. Never commit certificates, private keys or `.env.production`. For the existing server certificate under `/root/cert/hazivsroslyak.mooo.com`, configure:
+
+```dotenv
+LETSENCRYPT_DIR=/root/cert
+TLS_CERT_FILE=/etc/letsencrypt/hazivsroslyak.mooo.com/fullchain.pem
+TLS_KEY_FILE=/etc/letsencrypt/hazivsroslyak.mooo.com/privkey.pem
+HOST_CERT_FILE=/root/cert/hazivsroslyak.mooo.com/fullchain.pem
+HOST_KEY_FILE=/root/cert/hazivsroslyak.mooo.com/privkey.pem
+```
+
+`TLS_*` paths are inside the container; `HOST_*` paths are checked by deploy.sh on Linux. Preserve any existing application checkout and deploy into a separate directory such as `/opt/smart-caspian-transit`.
 
 ## Renewal
 

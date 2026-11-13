@@ -3,12 +3,20 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 compose=(docker compose --env-file Docker/.env.production -f Docker/compose.production.yaml)
 test -f Docker/.env.production || cp Docker/.env.example Docker/.env.production
+# Only read the two preflight paths; never source executable shell from an env file.
+env_path() {
+  local key="$1" fallback="$2" value
+  value=$(sed -n "s/^${key}=//p" Docker/.env.production | tail -n 1 | tr -d '\r')
+  printf '%s' "${value:-$fallback}"
+}
+host_cert=$(env_path HOST_CERT_FILE /etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem)
+host_key=$(env_path HOST_KEY_FILE /etc/letsencrypt/live/hazivsroslyak.mooo.com/privkey.pem)
 "${compose[@]}" config --quiet
-test -r /etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem || {
-  echo 'Missing certificate: /etc/letsencrypt/live/hazivsroslyak.mooo.com/fullchain.pem' >&2
+test -r "$host_cert" || {
+  echo "Missing certificate: $host_cert" >&2
   exit 1
 }
-test -r /etc/letsencrypt/live/hazivsroslyak.mooo.com/privkey.pem || {
+test -r "$host_key" || {
   echo 'Missing certificate private key; run deployment with suitable permissions.' >&2
   exit 1
 }
